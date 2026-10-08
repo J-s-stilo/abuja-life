@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Abuja Life</title>
 
   <style>
@@ -11,493 +10,179 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-    }
-
-    :root {
-      --bg: #07111f;
-      --panel: #0d1b2d;
-      --panel2: #11243a;
-      --border: rgba(255,255,255,.08);
-      --text: #f5f7fa;
-      --muted: #91a0b5;
-      --green: #22c55e;
-      --green-dark: #15803d;
-      --gold: #f5c542;
-      --red: #ef4444;
-      --blue: #3b82f6;
+      font-family: Arial, Helvetica, sans-serif;
     }
 
     body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
       min-height: 100vh;
-    }
-
-    button {
-      font: inherit;
-      cursor: pointer;
-    }
-
-    /* APP */
-
-    .app {
-      min-height: 100vh;
+      background: linear-gradient(135deg, #063b22, #0b7a46);
+      color: white;
       display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
     }
 
-    /* SIDEBAR */
-
-    .sidebar {
-      width: 250px;
-      background: #081522;
-      border-right: 1px solid var(--border);
-      position: fixed;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      padding: 22px 15px;
-      z-index: 20;
+    .container {
+      width: 100%;
+      max-width: 430px;
     }
 
     .logo {
-      padding: 5px 10px 25px;
+      text-align: center;
+      margin-bottom: 25px;
     }
 
     .logo h1 {
-      font-size: 24px;
-      letter-spacing: 1px;
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: -2px;
     }
 
     .logo span {
-      color: var(--green);
+      color: #d9f99d;
     }
 
     .logo p {
-      color: var(--muted);
-      font-size: 11px;
-      margin-top: 5px;
-      letter-spacing: 1px;
+      margin-top: 8px;
+      color: #d9f5e6;
+      font-size: 14px;
     }
 
-    .nav-title {
-      color: #5e7088;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      margin: 15px 10px 8px;
+    .card {
+      background: white;
+      color: #15231b;
+      border-radius: 22px;
+      padding: 28px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
     }
 
-    .nav {
+    .tabs {
       display: flex;
-      flex-direction: column;
-      gap: 4px;
+      background: #edf5ef;
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 24px;
     }
 
-    .nav button {
+    .tabs button {
+      width: 50%;
       border: 0;
-      background: transparent;
-      color: #aebacd;
-      text-align: left;
-      padding: 12px 12px;
+      padding: 12px;
       border-radius: 9px;
-      transition: .2s;
-    }
-
-    .nav button:hover,
-    .nav button.active {
-      background: rgba(34,197,94,.12);
-      color: white;
-    }
-
-    .nav button.active {
-      border-left: 3px solid var(--green);
-    }
-
-    /* MAIN */
-
-    .main {
-      margin-left: 250px;
-      width: calc(100% - 250px);
-      min-height: 100vh;
-    }
-
-    .topbar {
-      height: 70px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(7,17,31,.94);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 30px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .location {
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .location strong {
-      color: white;
-    }
-
-    .top-user {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .avatar {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #22c55e, #166534);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: transparent;
+      cursor: pointer;
       font-weight: bold;
+      color: #41604e;
     }
 
-    .top-user small {
-      color: var(--muted);
-      display: block;
-      margin-top: 2px;
+    .tabs button.active {
+      background: #08783f;
+      color: white;
     }
 
-    /* CONTENT */
-
-    .content {
-      padding: 30px;
-      max-width: 1500px;
-      margin: auto;
-    }
-
-    .welcome {
-      margin-bottom: 25px;
-    }
-
-    .welcome h2 {
-      font-size: 28px;
-      margin-bottom: 7px;
-    }
-
-    .welcome p {
-      color: var(--muted);
-    }
-
-    /* STATS */
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .stat {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      padding: 18px;
-    }
-
-    .stat-label {
-      color: var(--muted);
-      font-size: 12px;
+    h2 {
       margin-bottom: 8px;
+      font-size: 24px;
     }
 
-    .stat-value {
-      font-size: 23px;
+    .subtitle {
+      color: #718078;
+      font-size: 14px;
+      margin-bottom: 22px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
       font-weight: bold;
+      color: #34443a;
     }
 
-    .green {
-      color: var(--green);
-    }
-
-    .gold {
-      color: var(--gold);
-    }
-
-    .blue {
-      color: #60a5fa;
-    }
-
-    /* GRID */
-
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 20px;
-    }
-
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
-    }
-
-    .panel-header {
-      padding: 17px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .panel-header h3 {
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #d4ded8;
+      border-radius: 10px;
+      outline: none;
       font-size: 15px;
     }
 
-    .panel-header button {
-      background: transparent;
-      color: var(--green);
+    input:focus {
+      border-color: #08783f;
+      box-shadow: 0 0 0 3px rgba(8,120,63,.1);
+    }
+
+    .main-btn {
+      width: 100%;
       border: 0;
-      font-size: 12px;
+      padding: 15px;
+      border-radius: 11px;
+      background: #08783f;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 5px;
     }
 
-    /* CITY */
-
-    .city {
-      min-height: 340px;
-      padding: 20px;
-      background:
-        radial-gradient(circle at 20% 30%, rgba(34,197,94,.16), transparent 30%),
-        radial-gradient(circle at 80% 70%, rgba(59,130,246,.12), transparent 30%),
-        #0a1828;
-      position: relative;
+    .main-btn:hover {
+      background: #065f32;
     }
 
-    .city-title {
-      font-size: 18px;
-      margin-bottom: 5px;
-    }
-
-    .city-subtitle {
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 25px;
-    }
-
-    .districts {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-
-    .district {
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.035);
-      border-radius: 10px;
-      padding: 18px 12px;
-      transition: .2s;
-    }
-
-    .district:hover {
-      transform: translateY(-2px);
-      border-color: rgba(34,197,94,.4);
-      background: rgba(34,197,94,.08);
-    }
-
-    .district-icon {
-      font-size: 25px;
-      margin-bottom: 8px;
-    }
-
-    .district strong {
-      display: block;
+    .message {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 9px;
+      display: none;
       font-size: 13px;
     }
 
-    .district span {
+    .message.error {
       display: block;
-      color: var(--muted);
-      font-size: 10px;
-      margin-top: 4px;
+      background: #fee2e2;
+      color: #991b1b;
     }
 
-    /* QUICK ACTIONS */
-
-    .actions {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      padding: 18px;
-    }
-
-    .action {
-      border: 1px solid var(--border);
-      background: var(--panel2);
-      color: white;
-      border-radius: 10px;
-      padding: 15px;
-      text-align: left;
-    }
-
-    .action:hover {
-      border-color: rgba(34,197,94,.45);
-    }
-
-    .action-icon {
-      font-size: 22px;
-      margin-bottom: 8px;
-    }
-
-    .action strong {
-      font-size: 12px;
+    .message.success {
       display: block;
+      background: #dcfce7;
+      color: #166534;
     }
 
-    .action span {
-      color: var(--muted);
-      font-size: 10px;
-      display: block;
-      margin-top: 4px;
-    }
-
-    /* MISSIONS */
-
-    .mission-list {
-      padding: 10px 18px 18px;
-    }
-
-    .mission {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 13px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .mission:last-child {
-      border-bottom: 0;
-    }
-
-    .mission-info strong {
-      display: block;
-      font-size: 12px;
-    }
-
-    .mission-info span {
-      color: var(--muted);
-      font-size: 10px;
-    }
-
-    .reward {
-      color: var(--gold);
-      font-size: 11px;
-      white-space: nowrap;
-    }
-
-    /* ACTIVITY */
-
-    .activity {
-      padding: 10px 18px 18px;
-    }
-
-    .activity-item {
-      padding: 13px 0;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      gap: 10px;
-    }
-
-    .activity-item:last-child {
-      border-bottom: 0;
-    }
-
-    .activity-icon {
-      width: 30px;
-      height: 30px;
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(34,197,94,.1);
-    }
-
-    .activity-text {
-      font-size: 12px;
-    }
-
-    .activity-text span {
-      color: var(--muted);
-      display: block;
-      margin-top: 3px;
-      font-size: 10px;
-    }
-
-    /* MOBILE */
-
-    .mobile-nav {
+    .hidden {
       display: none;
     }
 
-    @media (max-width: 1050px) {
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-      }
+    .footer {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 12px;
+      color: #d7eee1;
     }
 
-    @media (max-width: 750px) {
-      .sidebar {
-        display: none;
+    .starter {
+      margin: 15px 0;
+      padding: 12px;
+      background: #f0fdf4;
+      border-radius: 10px;
+      color: #166534;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    @media (max-width: 450px) {
+      .card {
+        padding: 22px;
       }
 
-      .main {
-        margin-left: 0;
-        width: 100%;
-        padding-bottom: 70px;
-      }
-
-      .content {
-        padding: 18px;
-      }
-
-      .topbar {
-        padding: 0 18px;
-      }
-
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .districts {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .mobile-nav {
-        position: fixed;
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 65px;
-        background: #081522;
-        border-top: 1px solid var(--border);
-        z-index: 30;
-      }
-
-      .mobile-nav button {
-        border: 0;
-        background: transparent;
-        color: #8493a7;
-        font-size: 10px;
-      }
-
-      .mobile-nav button.active {
-        color: var(--green);
+      .logo h1 {
+        font-size: 36px;
       }
     }
   </style>
@@ -505,534 +190,377 @@
 
 <body>
 
-<div class="app">
-
-  <!-- =========================
-       SIDEBAR
-  ========================== -->
-
-  <aside class="sidebar">
+  <div class="container">
 
     <div class="logo">
       <h1>ABUJA <span>LIFE</span></h1>
-      <p>YOUR CITY. YOUR LIFE.</p>
+      <p>Your city. Your story. Your life.</p>
     </div>
 
-    <div class="nav-title">Game</div>
+    <div class="card">
 
-    <nav class="nav">
-      <button class="active" onclick="showSection('home')">🏠 Home</button>
-      <button onclick="showSection('city')">🗺️ Explore Abuja</button>
-      <button onclick="showSection('profile')">👤 My Character</button>
-      <button onclick="showSection('wallet')">💰 Wallet</button>
-      <button onclick="showSection('jobs')">💼 Jobs</button>
-      <button onclick="showSection('properties')">🏠 Properties</button>
-      <button onclick="showSection('vehicles')">🚗 Vehicles</button>
-      <button onclick="showSection('shop')">🛍️ Shop</button>
-      <button onclick="showSection('business')">🏢 Businesses</button>
-      <button onclick="showSection('missions')">🎯 Missions</button>
-    </nav>
+      <div class="tabs">
+        <button id="loginTab" class="active" onclick="showLogin()">
+          Login
+        </button>
 
-    <div class="nav-title">Social</div>
-
-    <nav class="nav">
-      <button onclick="showSection('friends')">👥 Friends</button>
-      <button onclick="showSection('chat')">💬 Chat</button>
-      <button onclick="showSection('leaderboard')">🏆 Leaderboard</button>
-    </nav>
-
-  </aside>
-
-
-  <!-- =========================
-       MAIN
-  ========================== -->
-
-  <main class="main">
-
-    <header class="topbar">
-
-      <div class="location">
-        📍 <strong id="playerLocation">Wuse, Abuja</strong>
+        <button id="registerTab" onclick="showRegister()">
+          Create Account
+        </button>
       </div>
 
-      <div class="top-user">
-        <div>
-          <strong id="topUsername">@Boss</strong>
-          <small>Level 1 • New Citizen</small>
+      <!-- LOGIN -->
+
+      <div id="loginForm">
+
+        <h2>Welcome back</h2>
+
+        <p class="subtitle">
+          Enter Abuja and continue your life.
+        </p>
+
+        <div class="form-group">
+          <label>Email</label>
+          <input
+            id="loginEmail"
+            type="email"
+            placeholder="Enter your email"
+          />
         </div>
 
-        <div class="avatar">
-          B
+        <div class="form-group">
+          <label>Password</label>
+          <input
+            id="loginPassword"
+            type="password"
+            placeholder="Enter your password"
+          />
         </div>
+
+        <button class="main-btn" onclick="login()">
+          Enter Abuja
+        </button>
+
+        <div id="loginMessage" class="message"></div>
+
       </div>
 
-    </header>
 
+      <!-- REGISTER -->
 
-    <div class="content">
+      <div id="registerForm" class="hidden">
 
-      <!-- =========================
-           HOME
-      ========================== -->
+        <h2>Create your player</h2>
 
-      <section id="home">
+        <p class="subtitle">
+          Start your life in Abuja.
+        </p>
 
-        <div class="welcome">
-          <h2>Welcome to Abuja Life</h2>
-          <p>Build your life. Make money. Explore Abuja. Create your story.</p>
+        <div class="form-group">
+          <label>Username</label>
+          <input
+            id="registerUsername"
+            type="text"
+            placeholder="Choose your username"
+          />
         </div>
 
-
-        <!-- PLAYER STATS -->
-
-        <div class="stats">
-
-          <div class="stat">
-            <div class="stat-label">💰 CASH</div>
-            <div class="stat-value green" id="cashBalance">
-              ₦1,000,000
-            </div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-label">⭐ LEVEL</div>
-            <div class="stat-value gold">
-              1
-            </div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-label">⚡ ENERGY</div>
-            <div class="stat-value blue">
-              100 / 100
-            </div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-label">❤️ HEALTH</div>
-            <div class="stat-value">
-              100 / 100
-            </div>
-          </div>
-
+        <div class="form-group">
+          <label>Email</label>
+          <input
+            id="registerEmail"
+            type="email"
+            placeholder="Enter your email"
+          />
         </div>
 
-
-        <div class="dashboard-grid">
-
-
-          <!-- CITY -->
-
-          <div class="panel">
-
-            <div class="panel-header">
-              <h3>🗺️ Explore Abuja</h3>
-              <button onclick="showSection('city')">View City →</button>
-            </div>
-
-            <div class="city">
-
-              <div class="city-title">
-                Abuja City
-              </div>
-
-              <div class="city-subtitle">
-                Choose where you want to go.
-              </div>
-
-              <div class="districts">
-
-                <button class="district" onclick="travel('Wuse')">
-                  <div class="district-icon">🏙️</div>
-                  <strong>Wuse</strong>
-                  <span>Business & Shopping</span>
-                </button>
-
-                <button class="district" onclick="travel('Garki')">
-                  <div class="district-icon">🏢</div>
-                  <strong>Garki</strong>
-                  <span>Government & Business</span>
-                </button>
-
-                <button class="district" onclick="travel('Maitama')">
-                  <div class="district-icon">🏡</div>
-                  <strong>Maitama</strong>
-                  <span>Luxury District</span>
-                </button>
-
-                <button class="district" onclick="travel('Asokoro')">
-                  <div class="district-icon">🏛️</div>
-                  <strong>Asokoro</strong>
-                  <span>Premium Area</span>
-                </button>
-
-                <button class="district" onclick="travel('Jabi')">
-                  <div class="district-icon">🌊</div>
-                  <strong>Jabi</strong>
-                  <span>Entertainment</span>
-                </button>
-
-                <button class="district" onclick="travel('Gwarinpa')">
-                  <div class="district-icon">🏘️</div>
-                  <strong>Gwarinpa</strong>
-                  <span>Residential Area</span>
-                </button>
-
-              </div>
-
-            </div>
-
-          </div>
-
-
-          <!-- QUICK ACTIONS -->
-
-          <div class="panel">
-
-            <div class="panel-header">
-              <h3>⚡ Quick Actions</h3>
-            </div>
-
-            <div class="actions">
-
-              <button class="action" onclick="showSection('wallet')">
-                <div class="action-icon">💸</div>
-                <strong>Send Money</strong>
-                <span>Transfer virtual cash</span>
-              </button>
-
-              <button class="action" onclick="showSection('jobs')">
-                <div class="action-icon">💼</div>
-                <strong>Find a Job</strong>
-                <span>Earn your first salary</span>
-              </button>
-
-              <button class="action" onclick="showSection('shop')">
-                <div class="action-icon">🛍️</div>
-                <strong>Visit Shop</strong>
-                <span>Buy items</span>
-              </button>
-
-              <button class="action" onclick="showSection('friends')">
-                <div class="action-icon">👥</div>
-                <strong>Friends</strong>
-                <span>Meet other players</span>
-              </button>
-
-            </div>
-
-          </div>
-
-
-          <!-- MISSIONS -->
-
-          <div class="panel">
-
-            <div class="panel-header">
-              <h3>🎯 Active Missions</h3>
-              <button onclick="showSection('missions')">View All →</button>
-            </div>
-
-            <div class="mission-list">
-
-              <div class="mission">
-                <div class="mission-info">
-                  <strong>Explore Wuse</strong>
-                  <span>Visit the Wuse district</span>
-                </div>
-                <div class="reward">+₦10,000</div>
-              </div>
-
-              <div class="mission">
-                <div class="mission-info">
-                  <strong>Find a Job</strong>
-                  <span>Get your first job</span>
-                </div>
-                <div class="reward">+500 XP</div>
-              </div>
-
-              <div class="mission">
-                <div class="mission-info">
-                  <strong>Make a Friend</strong>
-                  <span>Add your first friend</span>
-                </div>
-                <div class="reward">+₦5,000</div>
-              </div>
-
-            </div>
-
-          </div>
-
-
-          <!-- ACTIVITY -->
-
-          <div class="panel">
-
-            <div class="panel-header">
-              <h3>📋 Recent Activity</h3>
-            </div>
-
-            <div class="activity">
-
-              <div class="activity-item">
-                <div class="activity-icon">🎁</div>
-
-                <div class="activity-text">
-                  Welcome bonus received
-                  <span>+₦1,000,000 • Just now</span>
-                </div>
-              </div>
-
-              <div class="activity-item">
-                <div class="activity-icon">🏙️</div>
-
-                <div class="activity-text">
-                  Started life in Abuja
-                  <span>Wuse • Just now</span>
-                </div>
-              </div>
-
-              <div class="activity-item">
-                <div class="activity-icon">⭐</div>
-
-                <div class="activity-text">
-                  Character created
-                  <span>Level 1 • Just now</span>
-                </div>
-              </div>
-
-            </div>
-
-          </div>
-
+        <div class="form-group">
+          <label>Password</label>
+          <input
+            id="registerPassword"
+            type="password"
+            placeholder="Create a password"
+          />
         </div>
 
-      </section>
-
-
-      <!-- =========================
-           PLACEHOLDER SECTIONS
-      ========================== -->
-
-      <section id="city" style="display:none;">
-        <div class="welcome">
-          <h2>🗺️ Explore Abuja</h2>
-          <p>The complete interactive Abuja world will be built here.</p>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input
+            id="registerConfirm"
+            type="password"
+            placeholder="Confirm your password"
+          />
         </div>
-      </section>
 
-      <section id="profile" style="display:none;">
-        <div class="welcome">
-          <h2>👤 My Character</h2>
-          <p>Your character, level, XP, reputation and statistics.</p>
+        <div class="starter">
+          🎁 New players start with
+          <strong>₦1,000,000</strong>
+          virtual game money.
         </div>
-      </section>
 
-      <section id="wallet" style="display:none;">
-        <div class="welcome">
-          <h2>💰 Wallet</h2>
-          <p>Your virtual money, savings and transaction history.</p>
-        </div>
-      </section>
+        <button class="main-btn" onclick="register()">
+          Create Player
+        </button>
 
-      <section id="jobs" style="display:none;">
-        <div class="welcome">
-          <h2>💼 Jobs</h2>
-          <p>Find work and build your career.</p>
-        </div>
-      </section>
+        <div id="registerMessage" class="message"></div>
 
-      <section id="properties" style="display:none;">
-        <div class="welcome">
-          <h2>🏠 Properties</h2>
-          <p>Buy homes and build your property portfolio.</p>
-        </div>
-      </section>
-
-      <section id="vehicles" style="display:none;">
-        <div class="welcome">
-          <h2>🚗 Vehicles</h2>
-          <p>Buy and manage your vehicles.</p>
-        </div>
-      </section>
-
-      <section id="shop" style="display:none;">
-        <div class="welcome">
-          <h2>🛍️ Shop</h2>
-          <p>Buy clothing, phones, furniture, food and other items.</p>
-        </div>
-      </section>
-
-      <section id="business" style="display:none;">
-        <div class="welcome">
-          <h2>🏢 Businesses</h2>
-          <p>Build and manage your businesses.</p>
-        </div>
-      </section>
-
-      <section id="missions" style="display:none;">
-        <div class="welcome">
-          <h2>🎯 Missions</h2>
-          <p>Complete missions and earn rewards.</p>
-        </div>
-      </section>
-
-      <section id="friends" style="display:none;">
-        <div class="welcome">
-          <h2>👥 Friends</h2>
-          <p>Connect with other Abuja Life players.</p>
-        </div>
-      </section>
-
-      <section id="chat" style="display:none;">
-        <div class="welcome">
-          <h2>💬 Chat</h2>
-          <p>Chat with players in Abuja Life.</p>
-        </div>
-      </section>
-
-      <section id="leaderboard" style="display:none;">
-        <div class="welcome">
-          <h2>🏆 Leaderboard</h2>
-          <p>See the richest, highest-level and most successful players.</p>
-        </div>
-      </section>
+      </div>
 
     </div>
 
-  </main>
+    <div class="footer">
+      Abuja Life • Virtual game economy only
+    </div>
 
-</div>
-
-
-<!-- MOBILE NAV -->
-
-<nav class="mobile-nav">
-  <button class="active" onclick="showSection('home')">🏠<br>Home</button>
-  <button onclick="showSection('city')">🗺️<br>City</button>
-  <button onclick="showSection('wallet')">💰<br>Wallet</button>
-  <button onclick="showSection('friends')">👥<br>Friends</button>
-  <button onclick="showSection('profile')">👤<br>Profile</button>
-</nav>
+  </div>
 
 
 <script>
 
-  /* =========================
-     SECTION NAVIGATION
-  ========================== */
+  function showLogin() {
 
-  function showSection(section) {
+    document.getElementById("loginForm").classList.remove("hidden");
+    document.getElementById("registerForm").classList.add("hidden");
 
-    const sections = [
-      "home",
-      "city",
-      "profile",
-      "wallet",
-      "jobs",
-      "properties",
-      "vehicles",
-      "shop",
-      "business",
-      "missions",
-      "friends",
-      "chat",
-      "leaderboard"
-    ];
+    document.getElementById("loginTab").classList.add("active");
+    document.getElementById("registerTab").classList.remove("active");
 
-    sections.forEach(id => {
-      const element = document.getElementById(id);
-
-      if (element) {
-        element.style.display = id === section ? "block" : "none";
-      }
-    });
-
-    document.querySelectorAll(".nav button").forEach(button => {
-      button.classList.remove("active");
-    });
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
   }
 
 
-  /* =========================
-     TRAVEL
-  ========================== */
+  function showRegister() {
 
-  function travel(location) {
+    document.getElementById("loginForm").classList.add("hidden");
+    document.getElementById("registerForm").classList.remove("hidden");
 
-    document.getElementById("playerLocation").textContent =
-      location + ", Abuja";
+    document.getElementById("loginTab").classList.remove("active");
+    document.getElementById("registerTab").classList.add("active");
 
-    alert(
-      "You travelled to " +
-      location +
-      ".\n\nThe full location system will be connected to the game server next."
+  }
+
+
+  function showMessage(id, text, type) {
+
+    const element = document.getElementById(id);
+
+    element.textContent = text;
+
+    element.className = "message " + type;
+
+  }
+
+
+  async function register() {
+
+    const username =
+      document.getElementById("registerUsername").value.trim();
+
+    const email =
+      document.getElementById("registerEmail").value.trim();
+
+    const password =
+      document.getElementById("registerPassword").value;
+
+    const confirm =
+      document.getElementById("registerConfirm").value;
+
+
+    if (!username || !email || !password || !confirm) {
+
+      showMessage(
+        "registerMessage",
+        "Please complete all fields.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    if (password.length < 6) {
+
+      showMessage(
+        "registerMessage",
+        "Password must be at least 6 characters.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    if (password !== confirm) {
+
+      showMessage(
+        "registerMessage",
+        "Passwords do not match.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    showMessage(
+      "registerMessage",
+      "Creating your Abuja Life account...",
+      "success"
     );
+
+
+    try {
+
+      const response = await fetch("/api/register", {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          username,
+          email,
+          password
+        })
+
+      });
+
+
+      const result = await response.json();
+
+
+      if (!response.ok || !result.success) {
+
+        showMessage(
+          "registerMessage",
+          result.message || "Registration failed.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      showMessage(
+        "registerMessage",
+        "Account created successfully. Entering Abuja...",
+        "success"
+      );
+
+
+      setTimeout(() => {
+
+        window.location.href = "/game.html";
+
+      }, 1000);
+
+
+    } catch (error) {
+
+      showMessage(
+        "registerMessage",
+        "Unable to connect to Abuja Life server.",
+        "error"
+      );
+
+    }
+
   }
 
 
-  /* =========================
-     INITIAL PLAYER DATA
-  ========================== */
+  async function login() {
 
-  const player = {
-    username: "Boss",
-    balance: 1000000,
-    level: 1,
-    energy: 100,
-    health: 100,
-    location: "Wuse"
-  };
+    const email =
+      document.getElementById("loginEmail").value.trim();
+
+    const password =
+      document.getElementById("loginPassword").value;
 
 
-  /*
-    TEMPORARY DISPLAY ONLY.
+    if (!email || !password) {
 
-    Later this data will come from:
+      showMessage(
+        "loginMessage",
+        "Please enter your email and password.",
+        "error"
+      );
 
-    Render server
-          ↓
-    Supabase
-          ↓
-    Authenticated player
-
-    We will NOT trust the browser
-    with real wallet calculations.
-  */
+      return;
+    }
 
 
-  function formatNaira(amount) {
+    showMessage(
+      "loginMessage",
+      "Checking your account...",
+      "success"
+    );
 
-    return new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: "NGN",
-      maximumFractionDigits: 0
-    }).format(amount);
+
+    try {
+
+      const response = await fetch("/api/login", {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          email,
+          password
+        })
+
+      });
+
+
+      const result = await response.json();
+
+
+      if (!response.ok || !result.success) {
+
+        showMessage(
+          "loginMessage",
+          result.message || "Login failed.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      localStorage.setItem(
+        "abujaLifePlayer",
+        JSON.stringify(result.player)
+      );
+
+
+      showMessage(
+        "loginMessage",
+        "Login successful. Entering Abuja...",
+        "success"
+      );
+
+
+      setTimeout(() => {
+
+        window.location.href = "/game.html";
+
+      }, 700);
+
+
+    } catch (error) {
+
+      showMessage(
+        "loginMessage",
+        "Unable to connect to Abuja Life server.",
+        "error"
+      );
+
+    }
 
   }
-
-
-  function loadPlayer() {
-
-    document.getElementById("topUsername").textContent =
-      "@" + player.username;
-
-    document.getElementById("cashBalance").textContent =
-      formatNaira(player.balance);
-
-    document.getElementById("playerLocation").textContent =
-      player.location + ", Abuja";
-
-  }
-
-
-  loadPlayer();
 
 </script>
 
