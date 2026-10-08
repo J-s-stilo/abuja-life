@@ -129,10 +129,16 @@
       font-weight: bold;
       cursor: pointer;
       margin-top: 5px;
+      transition: .2s;
     }
 
     .main-btn:hover {
       background: #065f32;
+    }
+
+    .main-btn:disabled {
+      opacity: .65;
+      cursor: not-allowed;
     }
 
     .message {
@@ -176,6 +182,13 @@
       text-align: center;
     }
 
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #166534;
+      font-size: 14px;
+    }
+
     @media (max-width: 450px) {
       .card {
         padding: 22px;
@@ -199,15 +212,27 @@
 
     <div class="card">
 
+      <!-- LOGIN / REGISTER TABS -->
+
       <div class="tabs">
-        <button id="loginTab" class="active" onclick="showLogin()">
+        <button
+          id="loginTab"
+          class="active"
+          type="button"
+          onclick="showLogin()"
+        >
           Login
         </button>
 
-        <button id="registerTab" onclick="showRegister()">
+        <button
+          id="registerTab"
+          type="button"
+          onclick="showRegister()"
+        >
           Create Account
         </button>
       </div>
+
 
       <!-- LOGIN -->
 
@@ -220,35 +245,61 @@
         </p>
 
         <div class="form-group">
-          <label>Email</label>
+
+          <label for="loginEmail">
+            Email
+          </label>
+
           <input
             id="loginEmail"
             type="email"
+            autocomplete="email"
             placeholder="Enter your email"
           />
+
         </div>
 
+
         <div class="form-group">
-          <label>Password</label>
+
+          <label for="loginPassword">
+            Password
+          </label>
+
           <input
             id="loginPassword"
             type="password"
+            autocomplete="current-password"
             placeholder="Enter your password"
           />
+
         </div>
 
-        <button class="main-btn" onclick="login()">
+
+        <button
+          id="loginButton"
+          class="main-btn"
+          type="button"
+          onclick="login()"
+        >
           Enter Abuja
         </button>
 
-        <div id="loginMessage" class="message"></div>
+
+        <div
+          id="loginMessage"
+          class="message"
+        ></div>
 
       </div>
 
 
       <!-- REGISTER -->
 
-      <div id="registerForm" class="hidden">
+      <div
+        id="registerForm"
+        class="hidden"
+      >
 
         <h2>Create your player</h2>
 
@@ -256,41 +307,70 @@
           Start your life in Abuja.
         </p>
 
+
         <div class="form-group">
-          <label>Username</label>
+
+          <label for="registerUsername">
+            Username
+          </label>
+
           <input
             id="registerUsername"
             type="text"
+            autocomplete="username"
             placeholder="Choose your username"
           />
+
         </div>
 
+
         <div class="form-group">
-          <label>Email</label>
+
+          <label for="registerEmail">
+            Email
+          </label>
+
           <input
             id="registerEmail"
             type="email"
+            autocomplete="email"
             placeholder="Enter your email"
           />
+
         </div>
 
+
         <div class="form-group">
-          <label>Password</label>
+
+          <label for="registerPassword">
+            Password
+          </label>
+
           <input
             id="registerPassword"
             type="password"
+            autocomplete="new-password"
             placeholder="Create a password"
           />
+
         </div>
 
+
         <div class="form-group">
-          <label>Confirm Password</label>
+
+          <label for="registerConfirm">
+            Confirm Password
+          </label>
+
           <input
             id="registerConfirm"
             type="password"
+            autocomplete="new-password"
             placeholder="Confirm your password"
           />
+
         </div>
+
 
         <div class="starter">
           🎁 New players start with
@@ -298,15 +378,26 @@
           virtual game money.
         </div>
 
-        <button class="main-btn" onclick="register()">
+
+        <button
+          id="registerButton"
+          class="main-btn"
+          type="button"
+          onclick="register()"
+        >
           Create Player
         </button>
 
-        <div id="registerMessage" class="message"></div>
+
+        <div
+          id="registerMessage"
+          class="message"
+        ></div>
 
       </div>
 
     </div>
+
 
     <div class="footer">
       Abuja Life • Virtual game economy only
@@ -317,31 +408,98 @@
 
 <script>
 
+  /*
+   * ==========================================================
+   * ABUJA LIFE AUTHENTICATION
+   * ==========================================================
+   *
+   * The frontend talks to the Express server.
+   *
+   * Register:
+   * POST /api/auth/register
+   *
+   * Login:
+   * POST /api/auth/login
+   *
+   * Player:
+   * GET /api/player/:userId
+   *
+   * ==========================================================
+   */
+
+
+  const API_BASE = "";
+
+
+  /*
+   * ----------------------------------------------------------
+   * SWITCH TO LOGIN
+   * ----------------------------------------------------------
+   */
+
   function showLogin() {
 
-    document.getElementById("loginForm").classList.remove("hidden");
-    document.getElementById("registerForm").classList.add("hidden");
+    document
+      .getElementById("loginForm")
+      .classList.remove("hidden");
 
-    document.getElementById("loginTab").classList.add("active");
-    document.getElementById("registerTab").classList.remove("active");
+    document
+      .getElementById("registerForm")
+      .classList.add("hidden");
+
+
+    document
+      .getElementById("loginTab")
+      .classList.add("active");
+
+    document
+      .getElementById("registerTab")
+      .classList.remove("active");
 
   }
 
+
+  /*
+   * ----------------------------------------------------------
+   * SWITCH TO REGISTER
+   * ----------------------------------------------------------
+   */
 
   function showRegister() {
 
-    document.getElementById("loginForm").classList.add("hidden");
-    document.getElementById("registerForm").classList.remove("hidden");
+    document
+      .getElementById("loginForm")
+      .classList.add("hidden");
 
-    document.getElementById("loginTab").classList.remove("active");
-    document.getElementById("registerTab").classList.add("active");
+    document
+      .getElementById("registerForm")
+      .classList.remove("hidden");
+
+
+    document
+      .getElementById("loginTab")
+      .classList.remove("active");
+
+    document
+      .getElementById("registerTab")
+      .classList.add("active");
 
   }
 
+
+  /*
+   * ----------------------------------------------------------
+   * SHOW MESSAGE
+   * ----------------------------------------------------------
+   */
 
   function showMessage(id, text, type) {
 
     const element = document.getElementById(id);
+
+    if (!element) {
+      return;
+    }
 
     element.textContent = text;
 
@@ -350,22 +508,174 @@
   }
 
 
+  /*
+   * ----------------------------------------------------------
+   * HIDE MESSAGE
+   * ----------------------------------------------------------
+   */
+
+  function hideMessage(id) {
+
+    const element = document.getElementById(id);
+
+    if (!element) {
+      return;
+    }
+
+    element.textContent = "";
+
+    element.className = "message";
+
+  }
+
+
+  /*
+   * ----------------------------------------------------------
+   * GET USER ID FROM SERVER RESPONSE
+   * ----------------------------------------------------------
+   *
+   * This handles common response structures so the frontend
+   * remains compatible with the backend.
+   * ----------------------------------------------------------
+   */
+
+  function getUserId(result) {
+
+    return (
+      result?.user?.id ||
+      result?.player?.user_id ||
+      result?.player?.userId ||
+      result?.user_id ||
+      result?.userId ||
+      null
+    );
+
+  }
+
+
+  /*
+   * ----------------------------------------------------------
+   * SAVE PLAYER SESSION
+   * ----------------------------------------------------------
+   */
+
+  function savePlayerSession(result) {
+
+    const userId = getUserId(result);
+
+
+    if (userId) {
+
+      localStorage.setItem(
+        "abujaLifeUserId",
+        userId
+      );
+
+    }
+
+
+    if (result?.user) {
+
+      localStorage.setItem(
+        "abujaLifeUser",
+        JSON.stringify(result.user)
+      );
+
+    }
+
+
+    if (result?.player) {
+
+      localStorage.setItem(
+        "abujaLifePlayer",
+        JSON.stringify(result.player)
+      );
+
+    }
+
+
+    /*
+     * Save the complete authentication response as well.
+     * This makes it easier for game.html to restore the
+     * current player.
+     */
+
+    try {
+
+      localStorage.setItem(
+        "abujaLifeSession",
+        JSON.stringify(result)
+      );
+
+    } catch (error) {
+
+      console.warn(
+        "Could not save complete session.",
+        error
+      );
+
+    }
+
+  }
+
+
+  /*
+   * ----------------------------------------------------------
+   * GO TO GAME
+   * ----------------------------------------------------------
+   */
+
+  function enterGame() {
+
+    window.location.href = "/game.html";
+
+  }
+
+
+  /*
+   * ----------------------------------------------------------
+   * REGISTER PLAYER
+   * ----------------------------------------------------------
+   */
+
   async function register() {
 
     const username =
-      document.getElementById("registerUsername").value.trim();
+      document
+        .getElementById("registerUsername")
+        .value
+        .trim();
+
 
     const email =
-      document.getElementById("registerEmail").value.trim();
+      document
+        .getElementById("registerEmail")
+        .value
+        .trim();
+
 
     const password =
-      document.getElementById("registerPassword").value;
+      document
+        .getElementById("registerPassword")
+        .value;
+
 
     const confirm =
-      document.getElementById("registerConfirm").value;
+      document
+        .getElementById("registerConfirm")
+        .value;
 
 
-    if (!username || !email || !password || !confirm) {
+    /*
+     * Validation
+     */
+
+    if (
+      !username ||
+      !email ||
+      !password ||
+      !confirm
+    ) {
 
       showMessage(
         "registerMessage",
@@ -374,6 +684,20 @@
       );
 
       return;
+
+    }
+
+
+    if (username.length < 3) {
+
+      showMessage(
+        "registerMessage",
+        "Username must be at least 3 characters.",
+        "error"
+      );
+
+      return;
+
     }
 
 
@@ -386,6 +710,7 @@
       );
 
       return;
+
     }
 
 
@@ -398,7 +723,20 @@
       );
 
       return;
+
     }
+
+
+    /*
+     * Disable button while registering
+     */
+
+    const button =
+      document.getElementById("registerButton");
+
+    button.disabled = true;
+
+    button.textContent = "Creating Player...";
 
 
     showMessage(
@@ -410,35 +748,119 @@
 
     try {
 
-      const response = await fetch("/api/register", {
+      const response = await fetch(
+        API_BASE + "/api/auth/register",
+        {
+          method: "POST",
 
-        method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
 
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-          username,
-          email,
-          password
-        })
-
-      });
+          body: JSON.stringify({
+            username,
+            email,
+            password
+          })
+        }
+      );
 
 
-      const result = await response.json();
+      let result = {};
 
+      try {
+
+        result = await response.json();
+
+      } catch (jsonError) {
+
+        result = {};
+
+      }
+
+
+      /*
+       * Backend error
+       */
 
       if (!response.ok || !result.success) {
 
         showMessage(
           "registerMessage",
-          result.message || "Registration failed.",
+          result.message ||
+          result.error ||
+          "Registration failed.",
           "error"
         );
 
+        button.disabled = false;
+        button.textContent = "Create Player";
+
         return;
+
+      }
+
+
+      /*
+       * Save the new player
+       */
+
+      savePlayerSession(result);
+
+
+      /*
+       * If the registration response did not contain the
+       * player ID directly, try loading it using the returned
+       * user ID.
+       */
+
+      const userId = getUserId(result);
+
+
+      if (userId) {
+
+        try {
+
+          const playerResponse =
+            await fetch(
+              API_BASE +
+              "/api/player/" +
+              encodeURIComponent(userId)
+            );
+
+
+          if (playerResponse.ok) {
+
+            const playerResult =
+              await playerResponse.json();
+
+
+            if (playerResult?.success) {
+
+              const realPlayer =
+                playerResult.player ||
+                playerResult.data ||
+                playerResult;
+
+
+              localStorage.setItem(
+                "abujaLifePlayer",
+                JSON.stringify(realPlayer)
+              );
+
+            }
+
+          }
+
+        } catch (playerError) {
+
+          console.warn(
+            "Player profile could not be loaded immediately.",
+            playerError
+          );
+
+        }
+
       }
 
 
@@ -449,14 +871,24 @@
       );
 
 
-      setTimeout(() => {
+      /*
+       * Give the player a short moment to see the success
+       * message, then open the game.
+       */
 
-        window.location.href = "/game.html";
-
-      }, 1000);
+      setTimeout(
+        enterGame,
+        900
+      );
 
 
     } catch (error) {
+
+      console.error(
+        "Registration error:",
+        error
+      );
+
 
       showMessage(
         "registerMessage",
@@ -464,19 +896,39 @@
         "error"
       );
 
+
+      button.disabled = false;
+      button.textContent = "Create Player";
+
     }
 
   }
 
 
+  /*
+   * ----------------------------------------------------------
+   * LOGIN PLAYER
+   * ----------------------------------------------------------
+   */
+
   async function login() {
 
     const email =
-      document.getElementById("loginEmail").value.trim();
+      document
+        .getElementById("loginEmail")
+        .value
+        .trim();
+
 
     const password =
-      document.getElementById("loginPassword").value;
+      document
+        .getElementById("loginPassword")
+        .value;
 
+
+    /*
+     * Validation
+     */
 
     if (!email || !password) {
 
@@ -487,7 +939,20 @@
       );
 
       return;
+
     }
+
+
+    /*
+     * Disable button
+     */
+
+    const button =
+      document.getElementById("loginButton");
+
+    button.disabled = true;
+
+    button.textContent = "Checking...";
 
 
     showMessage(
@@ -499,41 +964,117 @@
 
     try {
 
-      const response = await fetch("/api/login", {
+      const response = await fetch(
+        API_BASE + "/api/auth/login",
+        {
+          method: "POST",
 
-        method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
 
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-          email,
-          password
-        })
-
-      });
+          body: JSON.stringify({
+            email,
+            password
+          })
+        }
+      );
 
 
-      const result = await response.json();
+      let result = {};
 
+      try {
+
+        result = await response.json();
+
+      } catch (jsonError) {
+
+        result = {};
+
+      }
+
+
+      /*
+       * Login failed
+       */
 
       if (!response.ok || !result.success) {
 
         showMessage(
           "loginMessage",
-          result.message || "Login failed.",
+          result.message ||
+          result.error ||
+          "Login failed.",
           "error"
         );
 
+        button.disabled = false;
+        button.textContent = "Enter Abuja";
+
         return;
+
       }
 
 
-      localStorage.setItem(
-        "abujaLifePlayer",
-        JSON.stringify(result.player)
-      );
+      /*
+       * Save real player session
+       */
+
+      savePlayerSession(result);
+
+
+      const userId = getUserId(result);
+
+
+      /*
+       * Load the real player profile from the database.
+       */
+
+      if (userId) {
+
+        try {
+
+          const playerResponse =
+            await fetch(
+              API_BASE +
+              "/api/player/" +
+              encodeURIComponent(userId)
+            );
+
+
+          if (playerResponse.ok) {
+
+            const playerResult =
+              await playerResponse.json();
+
+
+            if (playerResult?.success) {
+
+              const realPlayer =
+                playerResult.player ||
+                playerResult.data ||
+                playerResult;
+
+
+              localStorage.setItem(
+                "abujaLifePlayer",
+                JSON.stringify(realPlayer)
+              );
+
+            }
+
+          }
+
+        } catch (playerError) {
+
+          console.warn(
+            "Could not load player profile.",
+            playerError
+          );
+
+        }
+
+      }
 
 
       showMessage(
@@ -543,14 +1084,19 @@
       );
 
 
-      setTimeout(() => {
-
-        window.location.href = "/game.html";
-
-      }, 700);
+      setTimeout(
+        enterGame,
+        700
+      );
 
 
     } catch (error) {
+
+      console.error(
+        "Login error:",
+        error
+      );
+
 
       showMessage(
         "loginMessage",
@@ -558,9 +1104,147 @@
         "error"
       );
 
+
+      button.disabled = false;
+      button.textContent = "Enter Abuja";
+
     }
 
   }
+
+
+  /*
+   * ----------------------------------------------------------
+   * ENTER KEY SUPPORT
+   * ----------------------------------------------------------
+   */
+
+  document
+    .getElementById("loginPassword")
+    .addEventListener(
+      "keydown",
+      function(event) {
+
+        if (event.key === "Enter") {
+
+          login();
+
+        }
+
+      }
+    );
+
+
+  document
+    .getElementById("registerConfirm")
+    .addEventListener(
+      "keydown",
+      function(event) {
+
+        if (event.key === "Enter") {
+
+          register();
+
+        }
+
+      }
+    );
+
+
+  /*
+   * ----------------------------------------------------------
+   * CHECK EXISTING SESSION
+   * ----------------------------------------------------------
+   *
+   * If someone is already logged in, we don't make them
+   * log in again.
+   * ----------------------------------------------------------
+   */
+
+  async function checkExistingSession() {
+
+    const userId =
+      localStorage.getItem(
+        "abujaLifeUserId"
+      );
+
+
+    if (!userId) {
+
+      return;
+
+    }
+
+
+    try {
+
+      const response =
+        await fetch(
+          API_BASE +
+          "/api/player/" +
+          encodeURIComponent(userId)
+        );
+
+
+      if (!response.ok) {
+
+        return;
+
+      }
+
+
+      const result =
+        await response.json();
+
+
+      if (result?.success) {
+
+        const player =
+          result.player ||
+          result.data ||
+          result;
+
+
+        localStorage.setItem(
+          "abujaLifePlayer",
+          JSON.stringify(player)
+        );
+
+      }
+
+
+      /*
+       * Existing valid player.
+       *
+       * We intentionally leave the login screen available
+       * rather than automatically redirecting immediately.
+       * This prevents accidental redirects while testing.
+       */
+
+    } catch (error) {
+
+      console.warn(
+        "Existing session check failed.",
+        error
+      );
+
+    }
+
+  }
+
+
+  /*
+   * Start session check.
+   */
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+      checkExistingSession();
+
+    }
+  );
 
 </script>
 
