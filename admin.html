@@ -1,0 +1,1937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Abuja Life — Admin Control Center</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #070d16;
+      --sidebar: #0a111d;
+      --panel: #0d1725;
+      --panel2: #111f30;
+      --border: rgba(255,255,255,.08);
+      --text: #f5f7fa;
+      --muted: #8998ab;
+      --green: #22c55e;
+      --gold: #f5c542;
+      --red: #ef4444;
+      --blue: #3b82f6;
+      --orange: #f59e0b;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    /* =====================================
+       APP
+    ====================================== */
+
+    .app {
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* =====================================
+       SIDEBAR
+    ====================================== */
+
+    .sidebar {
+      width: 255px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 20px 14px;
+      overflow-y: auto;
+      z-index: 50;
+    }
+
+    .brand {
+      padding: 5px 10px 25px;
+    }
+
+    .brand h1 {
+      font-size: 22px;
+      letter-spacing: 1px;
+    }
+
+    .brand h1 span {
+      color: var(--green);
+    }
+
+    .brand small {
+      color: var(--muted);
+      display: block;
+      margin-top: 5px;
+      font-size: 9px;
+      letter-spacing: 1.4px;
+    }
+
+    .admin-badge {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 5px 8px;
+      border-radius: 5px;
+      background: rgba(239,68,68,.12);
+      color: #f87171;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .nav-title {
+      color: #53667d;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin: 17px 10px 7px;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .nav button {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: #aab8c9;
+      text-align: left;
+      padding: 11px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      transition: .2s;
+    }
+
+    .nav button:hover {
+      background: rgba(255,255,255,.04);
+      color: white;
+    }
+
+    .nav button.active {
+      background: rgba(34,197,94,.11);
+      color: white;
+      border-left: 3px solid var(--green);
+    }
+
+    /* =====================================
+       MAIN
+    ====================================== */
+
+    .main {
+      margin-left: 255px;
+      width: calc(100% - 255px);
+      min-height: 100vh;
+    }
+
+    .topbar {
+      height: 68px;
+      background: rgba(7,13,22,.95);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 28px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .page-title h2 {
+      font-size: 17px;
+    }
+
+    .page-title p {
+      color: var(--muted);
+      font-size: 10px;
+      margin-top: 4px;
+    }
+
+    .admin-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .admin-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #22c55e, #166534);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .admin-user small {
+      color: var(--muted);
+      display: block;
+      margin-top: 2px;
+      font-size: 9px;
+    }
+
+    /* =====================================
+       CONTENT
+    ====================================== */
+
+    .content {
+      padding: 28px;
+      max-width: 1550px;
+      margin: auto;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .heading {
+      margin-bottom: 22px;
+    }
+
+    .heading h2 {
+      font-size: 25px;
+    }
+
+    .heading p {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 12px;
+    }
+
+    /* =====================================
+       STATS
+    ====================================== */
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+    }
+
+    .stat-value {
+      font-size: 23px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .green {
+      color: var(--green);
+    }
+
+    .gold {
+      color: var(--gold);
+    }
+
+    .blue {
+      color: #60a5fa;
+    }
+
+    .red {
+      color: #f87171;
+    }
+
+    /* =====================================
+       PANELS
+    ====================================== */
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .panel-header {
+      min-height: 55px;
+      padding: 15px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-header h3 {
+      font-size: 13px;
+    }
+
+    .panel-header button {
+      border: 0;
+      background: transparent;
+      color: var(--green);
+      font-size: 11px;
+    }
+
+    /* =====================================
+       ACTIVITY
+    ====================================== */
+
+    .activity {
+      padding: 5px 18px 15px;
+    }
+
+    .activity-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .activity-item:last-child {
+      border-bottom: 0;
+    }
+
+    .activity-left {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .activity-icon {
+      width: 31px;
+      height: 31px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(34,197,94,.1);
+    }
+
+    .activity-text strong {
+      display: block;
+      font-size: 11px;
+    }
+
+    .activity-text span {
+      display: block;
+      color: var(--muted);
+      font-size: 9px;
+      margin-top: 3px;
+    }
+
+    .amount {
+      color: var(--green);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    /* =====================================
+       QUICK CONTROLS
+    ====================================== */
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 9px;
+      padding: 15px;
+    }
+
+    .quick {
+      padding: 14px;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: white;
+      text-align: left;
+    }
+
+    .quick:hover {
+      border-color: rgba(34,197,94,.4);
+    }
+
+    .quick-icon {
+      font-size: 20px;
+      margin-bottom: 7px;
+    }
+
+    .quick strong {
+      display: block;
+      font-size: 11px;
+    }
+
+    .quick span {
+      color: var(--muted);
+      display: block;
+      font-size: 9px;
+      margin-top: 3px;
+    }
+
+    /* =====================================
+       TABLES
+    ====================================== */
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      text-align: left;
+      color: var(--muted);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      padding: 13px 17px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 13px 17px;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 4px 7px;
+      border-radius: 5px;
+      font-size: 8px;
+      text-transform: uppercase;
+    }
+
+    .status.active {
+      background: rgba(34,197,94,.1);
+      color: var(--green);
+    }
+
+    .status.warning {
+      background: rgba(245,158,11,.1);
+      color: var(--orange);
+    }
+
+    .status.banned {
+      background: rgba(239,68,68,.1);
+      color: #f87171;
+    }
+
+    .table-action {
+      border: 1px solid var(--border);
+      background: var(--panel2);
+      color: #d7dee8;
+      padding: 5px 8px;
+      border-radius: 5px;
+      font-size: 9px;
+    }
+
+    /* =====================================
+       SEARCH
+    ====================================== */
+
+    .toolbar {
+      display: flex;
+      gap: 9px;
+      margin-bottom: 14px;
+    }
+
+    .search {
+      flex: 1;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: white;
+      padding: 11px 13px;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .search:focus {
+      border-color: rgba(34,197,94,.5);
+    }
+
+    .primary {
+      background: var(--green);
+      color: #04120a;
+      border: 0;
+      padding: 10px 15px;
+      border-radius: 7px;
+      font-weight: bold;
+      font-size: 11px;
+    }
+
+    .secondary {
+      background: var(--panel2);
+      color: white;
+      border: 1px solid var(--border);
+      padding: 10px 15px;
+      border-radius: 7px;
+      font-size: 11px;
+    }
+
+    /* =====================================
+       SETTINGS
+    ====================================== */
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .setting {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 17px;
+    }
+
+    .setting label {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      margin-bottom: 8px;
+    }
+
+    .setting input {
+      width: 100%;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      color: white;
+      border-radius: 7px;
+      padding: 10px;
+      outline: none;
+    }
+
+    /* =====================================
+       ECONOMY
+    ====================================== */
+
+    .economy-box {
+      padding: 20px;
+    }
+
+    .economy-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+    }
+
+    .economy-row:last-child {
+      border-bottom: 0;
+    }
+
+    .economy-row span {
+      color: var(--muted);
+    }
+
+    /* =====================================
+       MOBILE
+    ====================================== */
+
+    .mobile-bottom {
+      display: none;
+    }
+
+    @media (max-width: 1050px) {
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 750px) {
+
+      .sidebar {
+        display: none;
+      }
+
+      .main {
+        margin-left: 0;
+        width: 100%;
+        padding-bottom: 65px;
+      }
+
+      .content {
+        padding: 18px;
+      }
+
+      .topbar {
+        padding: 0 18px;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .mobile-bottom {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 62px;
+        background: #0a111d;
+        border-top: 1px solid var(--border);
+        z-index: 60;
+      }
+
+      .mobile-bottom button {
+        border: 0;
+        background: transparent;
+        color: #8090a4;
+        font-size: 9px;
+      }
+
+      .mobile-bottom button.active {
+        color: var(--green);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- =====================================
+       SIDEBAR
+  ====================================== -->
+
+  <aside class="sidebar">
+
+    <div class="brand">
+      <h1>ABUJA <span>LIFE</span></h1>
+      <small>ADMIN CONTROL CENTER</small>
+      <div class="admin-badge">SUPER ADMIN</div>
+    </div>
+
+    <div class="nav-title">Overview</div>
+
+    <nav class="nav">
+      <button class="active" onclick="showSection('dashboard', this)">
+        📊 Dashboard
+      </button>
+    </nav>
+
+    <div class="nav-title">Players</div>
+
+    <nav class="nav">
+      <button onclick="showSection('players', this)">👥 Players</button>
+      <button onclick="showSection('economy', this)">💰 Economy</button>
+      <button onclick="showSection('transactions', this)">📒 Transactions</button>
+      <button onclick="showSection('moderation', this)">🛡️ Moderation</button>
+    </nav>
+
+    <div class="nav-title">Game World</div>
+
+    <nav class="nav">
+      <button onclick="showSection('locations', this)">🗺️ Locations</button>
+      <button onclick="showSection('jobs', this)">💼 Jobs</button>
+      <button onclick="showSection('properties', this)">🏠 Properties</button>
+      <button onclick="showSection('vehicles', this)">🚗 Vehicles</button>
+      <button onclick="showSection('businesses', this)">🏢 Businesses</button>
+      <button onclick="showSection('items', this)">🛍️ Items</button>
+      <button onclick="showSection('missions', this)">🎯 Missions</button>
+      <button onclick="showSection('events', this)">🎉 Events</button>
+    </nav>
+
+    <div class="nav-title">System</div>
+
+    <nav class="nav">
+      <button onclick="showSection('admins', this)">👑 Admins</button>
+      <button onclick="showSection('settings', this)">⚙️ Game Settings</button>
+      <button onclick="showSection('audit', this)">📋 Audit Logs</button>
+    </nav>
+
+  </aside>
+
+
+  <!-- =====================================
+       MAIN
+  ====================================== -->
+
+  <main class="main">
+
+    <header class="topbar">
+
+      <div class="page-title">
+        <h2 id="pageTitle">Admin Dashboard</h2>
+        <p>Abuja Life management system</p>
+      </div>
+
+      <div class="admin-user">
+
+        <div>
+          <strong>Boss</strong>
+          <small>Super Administrator</small>
+        </div>
+
+        <div class="admin-avatar">
+          B
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <div class="content">
+
+
+      <!-- =====================================
+           DASHBOARD
+      ====================================== -->
+
+      <section id="dashboard" class="section active">
+
+        <div class="heading">
+          <h2>Game Overview</h2>
+          <p>Monitor Abuja Life from one control center.</p>
+        </div>
+
+
+        <div class="stats">
+
+          <div class="stat">
+            <div class="stat-label">Total Players</div>
+            <div class="stat-value">0</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">Online Now</div>
+            <div class="stat-value green">0</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">Virtual Economy</div>
+            <div class="stat-value gold">₦0</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">Transactions Today</div>
+            <div class="stat-value blue">0</div>
+          </div>
+
+        </div>
+
+
+        <div class="grid-2">
+
+          <div class="panel">
+
+            <div class="panel-header">
+              <h3>📋 Recent Economy Activity</h3>
+              <button onclick="showSection('transactions')">
+                View all →
+              </button>
+            </div>
+
+            <div class="activity">
+
+              <div class="activity-item">
+
+                <div class="activity-left">
+
+                  <div class="activity-icon">
+                    🎁
+                  </div>
+
+                  <div class="activity-text">
+                    <strong>Starter bonus system</strong>
+                    <span>Waiting for player registration</span>
+                  </div>
+
+                </div>
+
+                <div class="amount">
+                  ₦1,000,000
+                </div>
+
+              </div>
+
+
+              <div class="activity-item">
+
+                <div class="activity-left">
+
+                  <div class="activity-icon">
+                    💸
+                  </div>
+
+                  <div class="activity-text">
+                    <strong>Player transfers</strong>
+                    <span>No transfers recorded yet</span>
+                  </div>
+
+                </div>
+
+                <div class="amount">
+                  ₦0
+                </div>
+
+              </div>
+
+
+              <div class="activity-item">
+
+                <div class="activity-left">
+
+                  <div class="activity-icon">
+                    🏦
+                  </div>
+
+                  <div class="activity-text">
+                    <strong>Savings interest</strong>
+                    <span>Game economy system</span>
+                  </div>
+
+                </div>
+
+                <div class="amount">
+                  ₦0
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="panel">
+
+            <div class="panel-header">
+              <h3>⚡ Quick Controls</h3>
+            </div>
+
+            <div class="quick-grid">
+
+              <button class="quick" onclick="showSection('players')">
+                <div class="quick-icon">👥</div>
+                <strong>Manage Players</strong>
+                <span>View and manage accounts</span>
+              </button>
+
+              <button class="quick" onclick="showSection('economy')">
+                <div class="quick-icon">💰</div>
+                <strong>Economy</strong>
+                <span>Control virtual money</span>
+              </button>
+
+              <button class="quick" onclick="showSection('missions')">
+                <div class="quick-icon">🎯</div>
+                <strong>Create Mission</strong>
+                <span>Add game missions</span>
+              </button>
+
+              <button class="quick" onclick="showSection('settings')">
+                <div class="quick-icon">⚙️</div>
+                <strong>Game Settings</strong>
+                <span>Change game rules</span>
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================
+           PLAYERS
+      ====================================== -->
+
+      <section id="players" class="section">
+
+        <div class="heading">
+          <h2>👥 Players</h2>
+          <p>Manage Abuja Life player accounts.</p>
+        </div>
+
+        <div class="toolbar">
+
+          <input
+            class="search"
+            id="playerSearch"
+            placeholder="Search username..."
+            oninput="filterPlayers()"
+          >
+
+          <button class="primary" onclick="refreshPlayers()">
+            Refresh
+          </button>
+
+        </div>
+
+        <div class="panel">
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Level</th>
+                  <th>Balance</th>
+                  <th>Location</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody id="playersTable">
+
+                <tr>
+                  <td colspan="6">
+                    No players loaded yet.
+                  </td>
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================
+           ECONOMY
+      ====================================== -->
+
+      <section id="economy" class="section">
+
+        <div class="heading">
+          <h2>💰 Economy Control</h2>
+          <p>Monitor and manage the virtual Abuja Life economy.</p>
+        </div>
+
+        <div class="stats">
+
+          <div class="stat">
+            <div class="stat-label">Total Currency</div>
+            <div class="stat-value green">₦0</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">Total Earned</div>
+            <div class="stat-value">₦0</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">Total Spent</div>
+            <div class="stat-value gold">₦0</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">Transactions</div>
+            <div class="stat-value blue">0</div>
+          </div>
+
+        </div>
+
+        <div class="panel">
+
+          <div class="panel-header">
+            <h3>Economy Rules</h3>
+          </div>
+
+          <div class="economy-box">
+
+            <div class="economy-row">
+              <span>Starting Balance</span>
+              <strong>₦1,000,000</strong>
+            </div>
+
+            <div class="economy-row">
+              <span>Daily Bonus</span>
+              <strong>₦10,000</strong>
+            </div>
+
+            <div class="economy-row">
+              <span>Savings Interest</span>
+              <strong>5%</strong>
+            </div>
+
+            <div class="economy-row">
+              <span>Transfer Fee</span>
+              <strong>₦0</strong>
+            </div>
+
+            <div class="economy-row">
+              <span>Maximum Transfer</span>
+              <strong>₦5,000,000</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================
+           TRANSACTIONS
+      ====================================== -->
+
+      <section id="transactions" class="section">
+
+        <div class="heading">
+          <h2>📒 Transactions</h2>
+          <p>Every movement of virtual money will be recorded here.</p>
+        </div>
+
+        <div class="toolbar">
+
+          <input
+            class="search"
+            placeholder="Search transaction..."
+          >
+
+          <button class="secondary">
+            Export
+          </button>
+
+        </div>
+
+        <div class="panel">
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Sender</th>
+                  <th>Receiver</th>
+                  <th>Amount</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                <tr>
+                  <td colspan="7">
+                    No transactions recorded yet.
+                  </td>
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================
+           GENERIC GAME CONTENT SECTIONS
+      ====================================== -->
+
+      <section id="locations" class="section">
+        <div class="heading">
+          <h2>🗺️ Locations</h2>
+          <p>Manage Abuja districts and interactive locations.</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Abuja World Locations</h3>
+            <button class="primary">+ Add Location</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>District</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>Wuse</td>
+                  <td>Wuse</td>
+                  <td>District</td>
+                  <td><span class="status active">Active</span></td>
+                  <td><button class="table-action">Manage</button></td>
+                </tr>
+
+                <tr>
+                  <td>Garki</td>
+                  <td>Garki</td>
+                  <td>District</td>
+                  <td><span class="status active">Active</span></td>
+                  <td><button class="table-action">Manage</button></td>
+                </tr>
+
+                <tr>
+                  <td>Maitama</td>
+                  <td>Maitama</td>
+                  <td>District</td>
+                  <td><span class="status active">Active</span></td>
+                  <td><button class="table-action">Manage</button></td>
+                </tr>
+
+                <tr>
+                  <td>Asokoro</td>
+                  <td>Asokoro</td>
+                  <td>District</td>
+                  <td><span class="status active">Active</span></td>
+                  <td><button class="table-action">Manage</button></td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+
+      <section id="jobs" class="section">
+        <div class="heading">
+          <h2>💼 Jobs</h2>
+          <p>Create and manage careers available to players.</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Job Definitions</h3>
+            <button class="primary">+ Add Job</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Job</th>
+                  <th>Salary</th>
+                  <th>XP</th>
+                  <th>Energy</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>Software Engineer</td>
+                  <td>₦250,000</td>
+                  <td>500</td>
+                  <td>20</td>
+                  <td><span class="status active">Active</span></td>
+                </tr>
+
+                <tr>
+                  <td>Business Manager</td>
+                  <td>₦300,000</td>
+                  <td>600</td>
+                  <td>25</td>
+                  <td><span class="status active">Active</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+
+      <section id="properties" class="section">
+        <div class="heading">
+          <h2>🏠 Properties</h2>
+          <p>Manage homes and real estate.</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Property Catalog</h3>
+            <button class="primary">+ Add Property</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Property</th>
+                  <th>District</th>
+                  <th>Price</th>
+                  <th>Rent</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>Wuse Apartment</td>
+                  <td>Wuse</td>
+                  <td>₦2,000,000</td>
+                  <td>₦50,000</td>
+                  <td><span class="status active">Available</span></td>
+                </tr>
+
+                <tr>
+                  <td>Maitama Luxury House</td>
+                  <td>Maitama</td>
+                  <td>₦25,000,000</td>
+                  <td>₦300,000</td>
+                  <td><span class="status active">Available</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+
+      <section id="vehicles" class="section">
+        <div class="heading">
+          <h2>🚗 Vehicles</h2>
+          <p>Manage vehicles available in Abuja Life.</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Vehicle Catalog</h3>
+            <button class="primary">+ Add Vehicle</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Price</th>
+                  <th>Speed</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>City Sedan</td>
+                  <td>Car</td>
+                  <td>₦3,500,000</td>
+                  <td>120</td>
+                  <td><span class="status active">Active</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+
+      <section id="businesses" class="section">
+        <div class="heading">
+          <h2>🏢 Businesses</h2>
+          <p>Manage businesses players can own and operate.</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Business Types</h3>
+            <button class="primary">+ Add Business</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Business</th>
+                  <th>Category</th>
+                  <th>Purchase Price</th>
+                  <th>Income</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>Café</td>
+                  <td>Food</td>
+                  <td>₦5,000,000</td>
+                  <td>₦150,000</td>
+                  <td><span class="status active">Active</span></td>
+                </tr>
+
+                <tr>
+                  <td>Clothing Store</td>
+                  <td>Retail</td>
+                  <td>₦8,000,000</td>
+                  <td>₦250,000</td>
+                  <td><span class="status active">Active</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+
+      <section id="items" class="section">
+        <div class="heading">
+          <h2>🛍️ Items</h2>
+          <p>Manage the game's item and inventory catalog.</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Item Catalog</h3>
+            <button class="primary">+ Add Item</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Rarity</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>Smartphone</td>
+                  <td>Electronics</td>
+                  <td>₦500,000</td>
+                  <td>Common</td>
+                  <td><span class="status active">Active</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+
+      <section id="missions" class="section">
+        <div class="heading">
+          <h2>🎯 Missions</h2>
+          <p>Create missions, requirements and rewards.</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Mission System</h3>
+            <button class="primary">+ Create Mission</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Mission</th>
+                  <th>Type</th>
+                  <th>Reward</th>
+                  <th>XP</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>Explore Wuse</td>
+                  <td>Exploration</td>
+                  <td>₦10,000</td>
+                  <td>100</td>
+                  <td><span class="status active">Active</span></td>
+                </tr>
+
+                <tr>
+                  <td>Make Your First Friend</td>
+                  <td>Social</td>
+                  <td>₦5,000</td>
+                  <td>50</td>
+                  <td><span class="status active">Active</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+
+      <section id="events" class="section">
+        <div class="heading">
+          <h2>🎉 Events</h2>
+          <p>Manage temporary and city-wide game events.</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Events</h3>
+            <button class="primary">+ Create Event</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Event</th>
+                  <th>Location</th>
+                  <th>Reward</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>Abuja Weekend Festival</td>
+                  <td>Jabi</td>
+                  <td>₦50,000 + 500 XP</td>
+                  <td><span class="status warning">Upcoming</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- =====================================
+           MODERATION
+      ====================================== -->
+
+      <section id="moderation" class="section">
+
+        <div class="heading">
+          <h2>🛡️ Moderation</h2>
+          <p>Manage reports, bans and player safety.</p>
+        </div>
+
+        <div class="stats">
+
+          <div class="stat">
+            <div class="stat-label">Open Reports</div>
+            <div class="stat-value red">0</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">Suspended</div>
+            <div class="stat-value gold">0</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">Banned</div>
+            <div class="stat-value">0</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">Resolved Today</div>
+            <div class="stat-value green">0</div>
+          </div>
+
+        </div>
+
+        <div class="panel">
+
+          <div class="panel-header">
+            <h3>Player Reports</h3>
+          </div>
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>Report</th>
+                  <th>Reporter</th>
+                  <th>Target</th>
+                  <th>Reason</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td colspan="5">
+                    No reports yet.
+                  </td>
+                </tr>
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================
+           ADMINS
+      ====================================== -->
+
+      <section id="admins" class="section">
+
+        <div class="heading">
+          <h2>👑 Administrators</h2>
+          <p>Control administrator roles and permissions.</p>
+        </div>
+
+        <div class="panel">
+
+          <div class="panel-header">
+            <h3>Admin Accounts</h3>
+            <button class="primary">
+              + Add Admin
+            </button>
+          </div>
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Last Active</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                <tr>
+                  <td>Boss</td>
+                  <td>SUPER ADMIN</td>
+                  <td>
+                    <span class="status active">Active</span>
+                  </td>
+                  <td>Now</td>
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================
+           SETTINGS
+      ====================================== -->
+
+      <section id="settings" class="section">
+
+        <div class="heading">
+          <h2>⚙️ Game Settings</h2>
+          <p>Change game rules without rebuilding the entire application.</p>
+        </div>
+
+        <div class="settings-grid">
+
+          <div class="setting">
+            <label>Starting Balance</label>
+            <input id="startingBalance" value="1000000">
+          </div>
+
+          <div class="setting">
+            <label>Daily Bonus</label>
+            <input id="dailyBonus" value="10000">
+          </div>
+
+          <div class="setting">
+            <label>Savings Interest (%)</label>
+            <input id="interestRate" value="5">
+          </div>
+
+          <div class="setting">
+            <label>Transfer Fee</label>
+            <input id="transferFee" value="0">
+          </div>
+
+          <div class="setting">
+            <label>Maximum Transfer</label>
+            <input id="maxTransfer" value="5000000">
+          </div>
+
+          <div class="setting">
+            <label>XP Multiplier</label>
+            <input id="xpMultiplier" value="1">
+          </div>
+
+          <div class="setting">
+            <label>Energy Regeneration</label>
+            <input id="energyRegeneration" value="10">
+          </div>
+
+          <div class="setting">
+            <label>Game Status</label>
+            <select id="gameStatus">
+              <option value="online">Online</option>
+              <option value="maintenance">Maintenance</option>
+            </select>
+          </div>
+
+        </div>
+
+        <br>
+
+        <button class="primary" onclick="saveSettings()">
+          Save Game Settings
+        </button>
+
+      </section>
+
+
+      <!-- =====================================
+           AUDIT LOG
+      ====================================== -->
+
+      <section id="audit" class="section">
+
+        <div class="heading">
+          <h2>📋 Audit Logs</h2>
+          <p>Every important administrator action will be recorded.</p>
+        </div>
+
+        <div class="panel">
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>Admin</th>
+                  <th>Action</th>
+                  <th>Target</th>
+                  <th>Reason</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                <tr>
+                  <td>Boss</td>
+                  <td>System initialized</td>
+                  <td>ABUJA LIFE</td>
+                  <td>Initial setup</td>
+                  <td>Today</td>
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+</div>
+
+
+<!-- =====================================
+     MOBILE NAV
+====================================== -->
+
+<nav class="mobile-bottom">
+
+  <button
+    class="active"
+    onclick="showSection('dashboard', this)">
+    📊<br>Dashboard
+  </button>
+
+  <button
+    onclick="showSection('players', this)">
+    👥<br>Players
+  </button>
+
+  <button
+    onclick="showSection('economy', this)">
+    💰<br>Economy
+  </button>
+
+  <button
+    onclick="showSection('settings', this)">
+    ⚙️<br>Settings
+  </button>
+
+</nav>
+
+
+<script>
+
+  /* =====================================
+     SECTION NAVIGATION
+  ====================================== */
+
+  const sectionTitles = {
+
+    dashboard: "Admin Dashboard",
+    players: "Players",
+    economy: "Economy Control",
+    transactions: "Transactions",
+    moderation: "Moderation",
+    locations: "Locations",
+    jobs: "Jobs",
+    properties: "Properties",
+    vehicles: "Vehicles",
+    businesses: "Businesses",
+    items: "Items",
+    missions: "Missions",
+    events: "Events",
+    admins: "Administrators",
+    settings: "Game Settings",
+    audit: "Audit Logs"
+
+  };
+
+
+  function showSection(section, button) {
+
+    document.querySelectorAll(".section").forEach(el => {
+      el.classList.remove("active");
+    });
+
+    const target = document.getElementById(section);
+
+    if (target) {
+      target.classList.add("active");
+    }
+
+    document.querySelectorAll(".nav button").forEach(el => {
+      el.classList.remove("active");
+    });
+
+    if (button) {
+      button.classList.add("active");
+    }
+
+    document.querySelector("#pageTitle").textContent =
+      sectionTitles[section] || "Admin Dashboard";
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+
+  /* =====================================
+     PLAYER SEARCH
+  ====================================== */
+
+  function filterPlayers() {
+
+    const search =
+      document.getElementById("playerSearch")
+        .value
+        .toLowerCase();
+
+    const rows =
+      document.querySelectorAll("#playersTable tr");
+
+    rows.forEach(row => {
+
+      const text =
+        row.textContent.toLowerCase();
+
+      row.style.display =
+        text.includes(search)
+          ? ""
+          : "none";
+
+    });
+
+  }
+
+
+  /* =====================================
+     REFRESH PLAYERS
+  ====================================== */
+
+  function refreshPlayers() {
+
+    /*
+      Later this will call:
+
+      GET /api/admin/players
+
+      The server will retrieve
+      authenticated player data
+      from Supabase.
+    */
+
+    alert(
+      "Player data will be loaded from the Abuja Life server once the admin API is connected."
+    );
+
+  }
+
+
+  /* =====================================
+     GAME SETTINGS
+  ====================================== */
+
+  function saveSettings() {
+
+    const settings = {
+
+      starting_balance:
+        Number(
+          document.getElementById("startingBalance").value
+        ),
+
+      daily_bonus:
+        Number(
+          document.getElementById("dailyBonus").value
+        ),
+
+      interest_rate:
+        Number(
+          document.getElementById("interestRate").value
+        ),
+
+      transfer_fee:
+        Number(
+          document.getElementById("transferFee").value
+        ),
+
+      max_transfer:
+        Number(
+          document.getElementById("maxTransfer").value
+        ),
+
+      xp_multiplier:
+        Number(
+          document.getElementById("xpMultiplier").value
+        ),
+
+      energy_regeneration:
+        Number(
+          document.getElementById("energyRegeneration").value
+        ),
+
+      game_status:
+        document.getElementById("gameStatus").value
+
+    };
+
+
+    /*
+      IMPORTANT:
+
+      This currently only prepares the data.
+
+      Later we will send it to:
+
+          POST /api/admin/settings
+
+      The server will validate
+      administrator permissions and
+      save the settings in Supabase.
+    */
+
+    console.log(
+      "Game settings prepared:",
+      settings
+    );
+
+    alert(
+      "Settings are ready to be connected to the server."
+    );
+
+  }
+
+</script>
+
+</body>
+</html>
