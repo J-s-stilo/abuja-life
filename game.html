@@ -1,0 +1,4244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Abuja Life</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
+}
+
+:root{
+    --green:#087f3f;
+    --green2:#0ca653;
+    --dark:#061b11;
+    --dark2:#0a2417;
+    --white:#fff;
+    --gray:#aebdb4;
+    --gold:#ffd447;
+    --red:#ff4d5e;
+    --panel:rgba(5,25,16,.94);
+}
+
+body{
+    width:100%;
+    height:100vh;
+    overflow:hidden;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#07150e;
+    color:white;
+}
+
+/* ================================
+   LOADING
+================================ */
+
+#loading{
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    background:
+      radial-gradient(circle at center,#0d6135 0,#04150d 60%);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:15px;
+}
+
+.logo{
+    font-size:42px;
+    font-weight:900;
+    letter-spacing:2px;
+}
+
+.logo span{
+    color:#45d98a;
+}
+
+.loader{
+    width:220px;
+    height:5px;
+    background:#173b28;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.loader div{
+    width:40%;
+    height:100%;
+    background:#39d77f;
+    animation:load 1.2s infinite;
+}
+
+@keyframes load{
+    from{transform:translateX(-100%)}
+    to{transform:translateX(350%)}
+}
+
+/* ================================
+   GAME
+================================ */
+
+#game{
+    position:fixed;
+    inset:0;
+    display:none;
+    background:#101b15;
+}
+
+#world{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    background:#63845f;
+}
+
+canvas{
+    display:block;
+    width:100%;
+    height:100%;
+}
+
+/* ================================
+   HUD
+================================ */
+
+#hud{
+    position:absolute;
+    top:12px;
+    left:12px;
+    right:12px;
+    z-index:20;
+    display:flex;
+    justify-content:space-between;
+    pointer-events:none;
+}
+
+.hudLeft,
+.hudRight{
+    display:flex;
+    gap:8px;
+    align-items:center;
+}
+
+.hudCard{
+    background:rgba(3,18,11,.86);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:13px;
+    padding:8px 12px;
+    box-shadow:0 8px 30px rgba(0,0,0,.25);
+}
+
+.playerMini{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.avatarMini{
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    background:#dca57b;
+    border:2px solid white;
+}
+
+.username{
+    font-weight:800;
+}
+
+.level{
+    font-size:11px;
+    color:#65df99;
+}
+
+.money{
+    color:#63e69a;
+    font-weight:900;
+}
+
+.statLine{
+    font-size:11px;
+    color:#d4ddd8;
+}
+
+#locationHud{
+    position:absolute;
+    top:82px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:15;
+    background:rgba(4,22,13,.82);
+    border:1px solid rgba(255,255,255,.12);
+    padding:8px 18px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+/* ================================
+   MENU BUTTON
+================================ */
+
+#menuBtn{
+    position:absolute;
+    right:15px;
+    bottom:125px;
+    z-index:30;
+    width:56px;
+    height:56px;
+    border-radius:50%;
+    border:none;
+    color:white;
+    background:linear-gradient(145deg,#0caf59,#075c30);
+    font-size:24px;
+    box-shadow:0 8px 25px rgba(0,0,0,.4);
+}
+
+/* ================================
+   PHONE MENU
+================================ */
+
+#phone{
+    position:absolute;
+    z-index:100;
+    right:15px;
+    top:70px;
+    width:330px;
+    max-width:calc(100vw - 30px);
+    max-height:calc(100vh - 100px);
+    background:rgba(3,18,11,.97);
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:24px;
+    box-shadow:0 25px 80px rgba(0,0,0,.6);
+    display:none;
+    overflow:hidden;
+}
+
+.phoneHeader{
+    padding:18px;
+    background:linear-gradient(135deg,#087f3f,#063d23);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.phoneTitle{
+    font-size:19px;
+    font-weight:900;
+}
+
+.close{
+    border:none;
+    background:rgba(255,255,255,.1);
+    color:white;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+}
+
+.phoneGrid{
+    padding:14px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    overflow-y:auto;
+    max-height:calc(100vh - 170px);
+}
+
+.appIcon{
+    min-height:76px;
+    border:1px solid rgba(255,255,255,.08);
+    background:#0b2b1b;
+    border-radius:15px;
+    color:white;
+    cursor:pointer;
+    padding:8px 4px;
+    font-size:11px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+}
+
+.appIcon span{
+    font-size:25px;
+}
+
+.appIcon:active{
+    transform:scale(.96);
+    background:#104a2b;
+}
+
+/* ================================
+   PANELS
+================================ */
+
+#panel{
+    position:absolute;
+    z-index:200;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(0,0,0,.55);
+}
+
+.panelBox{
+    width:650px;
+    max-width:100%;
+    max-height:90vh;
+    overflow-y:auto;
+    background:#071b11;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:22px;
+    box-shadow:0 30px 100px rgba(0,0,0,.65);
+}
+
+.panelHead{
+    padding:18px 20px;
+    background:linear-gradient(135deg,#0a7139,#06351f);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    position:sticky;
+    top:0;
+    z-index:2;
+}
+
+.panelHead h2{
+    font-size:20px;
+}
+
+.panelBody{
+    padding:20px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;
+}
+
+.card{
+    background:#0b291a;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:15px;
+    padding:15px;
+}
+
+.card h3{
+    margin-bottom:7px;
+}
+
+.card p{
+    color:#afc0b6;
+    font-size:13px;
+    line-height:1.5;
+}
+
+.btn{
+    border:none;
+    border-radius:11px;
+    padding:11px 15px;
+    cursor:pointer;
+    background:#0ca653;
+    color:white;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.btn.secondary{
+    background:#163526;
+}
+
+.btn.gold{
+    background:#a77a00;
+}
+
+.btn.danger{
+    background:#a72837;
+}
+
+input,
+select{
+    width:100%;
+    padding:12px;
+    margin-top:8px;
+    background:#06170e;
+    border:1px solid #244a36;
+    color:white;
+    border-radius:10px;
+    outline:none;
+}
+
+label{
+    display:block;
+    color:#b8c9c0;
+    font-size:12px;
+    margin-top:12px;
+}
+
+/* ================================
+   INTRO / AGE GATE
+================================ */
+
+#intro{
+    position:absolute;
+    inset:0;
+    z-index:500;
+    background:
+       radial-gradient(circle at 50% 30%,#128348,#04170d 65%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.introBox{
+    max-width:650px;
+    width:100%;
+    text-align:center;
+    padding:35px 25px;
+}
+
+.introLogo{
+    font-size:52px;
+    font-weight:900;
+    margin-bottom:10px;
+}
+
+.introLogo span{
+    color:#4be18b;
+}
+
+.introBox p{
+    color:#b9ccc0;
+    line-height:1.7;
+}
+
+.introButtons{
+    display:flex;
+    gap:12px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-top:25px;
+}
+
+.bigBtn{
+    border:none;
+    padding:14px 22px;
+    border-radius:14px;
+    font-weight:900;
+    color:white;
+    background:#0ca653;
+    cursor:pointer;
+}
+
+.bigBtn.dark{
+    background:#142d20;
+}
+
+/* ================================
+   CHARACTER CREATOR
+================================ */
+
+#creator{
+    position:absolute;
+    inset:0;
+    z-index:600;
+    display:none;
+    background:linear-gradient(135deg,#04140c,#0b3c23);
+    overflow-y:auto;
+}
+
+.creatorWrap{
+    max-width:1000px;
+    margin:auto;
+    min-height:100%;
+    padding:30px 20px;
+}
+
+.creatorTitle{
+    text-align:center;
+    font-size:32px;
+    font-weight:900;
+    margin-bottom:25px;
+}
+
+.creatorGrid{
+    display:grid;
+    grid-template-columns:280px 1fr;
+    gap:25px;
+}
+
+.characterPreview{
+    min-height:450px;
+    border-radius:25px;
+    background:
+       radial-gradient(circle at 50% 25%,rgba(255,255,255,.15),transparent 30%),
+       linear-gradient(#0d6736,#061d11);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    overflow:hidden;
+}
+
+.char{
+    width:110px;
+    height:270px;
+    position:relative;
+}
+
+.charHead{
+    width:85px;
+    height:100px;
+    background:#b8754f;
+    border-radius:45% 45% 42% 42%;
+    position:absolute;
+    left:13px;
+    top:5px;
+    border:2px solid rgba(0,0,0,.2);
+}
+
+.charHair{
+    position:absolute;
+    width:92px;
+    height:50px;
+    left:9px;
+    top:0;
+    background:#17110d;
+    border-radius:55px 55px 20px 20px;
+    z-index:2;
+}
+
+.charBody{
+    position:absolute;
+    top:95px;
+    left:7px;
+    width:98px;
+    height:125px;
+    background:#087f3f;
+    border-radius:20px 20px 12px 12px;
+}
+
+.charLeg{
+    position:absolute;
+    top:210px;
+    width:35px;
+    height:60px;
+    background:#24262b;
+    border-radius:10px;
+}
+
+.charLeg.one{
+    left:18px;
+}
+
+.charLeg.two{
+    right:18px;
+}
+
+.options{
+    background:#071b11;
+    border-radius:20px;
+    padding:20px;
+}
+
+.optionRow{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:8px;
+}
+
+.option{
+    border:1px solid #315a44;
+    background:#102a1c;
+    color:white;
+    padding:9px 13px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.option.active{
+    border-color:#3ee487;
+    background:#125d35;
+}
+
+/* ================================
+   CONTROLS
+================================ */
+
+#controls{
+    position:absolute;
+    z-index:25;
+    left:18px;
+    bottom:18px;
+    width:160px;
+    height:160px;
+    display:grid;
+    grid-template-columns:repeat(3,50px);
+    grid-template-rows:repeat(3,50px);
+    gap:5px;
+}
+
+.control{
+    border:none;
+    border-radius:13px;
+    background:rgba(4,23,14,.75);
+    color:white;
+    font-size:20px;
+    border:1px solid rgba(255,255,255,.1);
+}
+
+.control.up{grid-column:2}
+.control.left{grid-column:1;grid-row:2}
+.control.down{grid-column:2;grid-row:2}
+.control.right{grid-column:3;grid-row:2}
+
+/* ================================
+   ACTION BUTTONS
+================================ */
+
+#actions{
+    position:absolute;
+    right:20px;
+    bottom:18px;
+    z-index:25;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:8px;
+}
+
+.actionBtn{
+    border:none;
+    min-width:95px;
+    padding:12px 15px;
+    border-radius:13px;
+    color:white;
+    font-weight:bold;
+    background:rgba(5,25,16,.86);
+    border:1px solid rgba(255,255,255,.12);
+}
+
+.actionBtn.primary{
+    background:#0a984c;
+}
+
+/* ================================
+   NOTIFICATION
+================================ */
+
+#toast{
+    position:absolute;
+    z-index:1000;
+    left:50%;
+    bottom:25px;
+    transform:translateX(-50%) translateY(100px);
+    background:#071c11;
+    border:1px solid #245a3b;
+    padding:13px 20px;
+    border-radius:14px;
+    box-shadow:0 10px 40px rgba(0,0,0,.5);
+    opacity:0;
+    transition:.3s;
+    pointer-events:none;
+    max-width:90%;
+    text-align:center;
+}
+
+#toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+}
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media(max-width:700px){
+    .hudRight{
+        display:none;
+    }
+
+    #hud{
+        right:8px;
+        left:8px;
+    }
+
+    .hudCard{
+        padding:6px 8px;
+    }
+
+    #locationHud{
+        top:75px;
+    }
+
+    .creatorGrid{
+        grid-template-columns:1fr;
+    }
+
+    .characterPreview{
+        min-height:330px;
+    }
+
+    .phoneGrid{
+        grid-template-columns:repeat(3,1fr);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================================
+     LOADING
+================================ -->
+
+<div id="loading">
+    <div class="logo">ABUJA <span>LIFE</span></div>
+    <div style="color:#aac1b3">Loading Abuja...</div>
+    <div class="loader"><div></div></div>
+</div>
+
+<!-- ================================
+     GAME
+================================ -->
+
+<div id="game">
+
+    <div id="world">
+        <canvas id="cityCanvas"></canvas>
+    </div>
+
+    <div id="hud">
+
+        <div class="hudLeft">
+
+            <div class="hudCard">
+                <div class="playerMini">
+                    <div class="avatarMini" id="miniAvatar"></div>
+                    <div>
+                        <div class="username" id="hudUsername">Player</div>
+                        <div class="level" id="hudLevel">Level 1</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hudCard">
+                <div class="money" id="hudMoney">₦1,000,000</div>
+                <div class="statLine">Virtual Cash</div>
+            </div>
+
+        </div>
+
+        <div class="hudRight">
+
+            <div class="hudCard">
+                <div>❤️ <span id="hudHealth">100</span></div>
+                <div class="statLine">Health</div>
+            </div>
+
+            <div class="hudCard">
+                <div>⚡ <span id="hudEnergy">100</span></div>
+                <div class="statLine">Energy</div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="locationHud">Wuse • Abuja</div>
+
+    <button id="menuBtn">☰</button>
+
+    <!-- PHONE -->
+
+    <div id="phone">
+
+        <div class="phoneHeader">
+            <div>
+                <div class="phoneTitle">Abuja Life</div>
+                <small id="phoneUser">Player</small>
+            </div>
+            <button class="close" onclick="togglePhone()">×</button>
+        </div>
+
+        <div class="phoneGrid">
+
+            <button class="appIcon" onclick="openSystem('city')">
+                <span>🗺️</span>Abuja City
+            </button>
+
+            <button class="appIcon" onclick="openSystem('profile')">
+                <span>👤</span>Profile
+            </button>
+
+            <button class="appIcon" onclick="openSystem('wallet')">
+                <span>💰</span>Wallet
+            </button>
+
+            <button class="appIcon" onclick="openSystem('jobs')">
+                <span>💼</span>Jobs
+            </button>
+
+            <button class="appIcon" onclick="openSystem('business')">
+                <span>🏢</span>Business
+            </button>
+
+            <button class="appIcon" onclick="openSystem('properties')">
+                <span>🏠</span>Properties
+            </button>
+
+            <button class="appIcon" onclick="openSystem('cars')">
+                <span>🚗</span>Cars
+            </button>
+
+            <button class="appIcon" onclick="openSystem('motorcycles')">
+                <span>🏍️</span>Motorcycles
+            </button>
+
+            <button class="appIcon" onclick="openSystem('routes')">
+                <span>🛣️</span>Express Routes
+            </button>
+
+            <button class="appIcon" onclick="openSystem('friends')">
+                <span>👥</span>Friends
+            </button>
+
+            <button class="appIcon" onclick="openSystem('chat')">
+                <span>💬</span>Chat
+            </button>
+
+            <button class="appIcon" onclick="openSystem('voice')">
+                <span>🎙️</span>Voice
+            </button>
+
+            <button class="appIcon" onclick="openSystem('send')">
+                <span>💸</span>Send Money
+            </button>
+
+            <button class="appIcon" onclick="openSystem('missions')">
+                <span>🎯</span>Missions
+            </button>
+
+            <button class="appIcon" onclick="openSystem('market')">
+                <span>🛍️</span>Marketplace
+            </button>
+
+            <button class="appIcon" onclick="openSystem('leaderboard')">
+                <span>🏆</span>Leaderboard
+            </button>
+
+            <button class="appIcon" onclick="openSystem('events')">
+                <span>🎉</span>Events
+            </button>
+
+            <button class="appIcon" onclick="openSystem('settings')">
+                <span>⚙️</span>Settings
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- PANELS -->
+
+    <div id="panel">
+        <div class="panelBox">
+            <div class="panelHead">
+                <h2 id="panelTitle">Abuja Life</h2>
+                <button class="close" onclick="closePanel()">×</button>
+            </div>
+            <div class="panelBody" id="panelBody"></div>
+        </div>
+    </div>
+
+    <!-- CONTROLS -->
+
+    <div id="controls">
+        <button class="control up" data-dir="up">▲</button>
+        <button class="control left" data-dir="left">◀</button>
+        <button class="control down" data-dir="down">▼</button>
+        <button class="control right" data-dir="right">▶</button>
+    </div>
+
+    <div id="actions">
+        <button class="actionBtn primary" onclick="interact()">INTERACT</button>
+        <button class="actionBtn" onclick="enterVehicle()">ENTER VEHICLE</button>
+    </div>
+
+    <div id="toast"></div>
+
+</div>
+
+<!-- ================================
+     INTRO
+================================ -->
+
+<div id="intro" style="display:none">
+
+    <div class="introBox">
+
+        <div class="introLogo">
+            ABUJA <span>LIFE</span>
+        </div>
+
+        <h2 style="margin-bottom:12px">
+            Welcome to your new life in Abuja.
+        </h2>
+
+        <p>
+            Build your career. Buy cars. Own property.
+            Meet people. Explore Abuja. Start businesses.
+            Travel. Complete missions. Create your own story.
+        </p>
+
+        <div style="margin-top:22px;color:#8fa99b;font-size:13px">
+            This game uses virtual currency only.
+        </div>
+
+        <div class="introButtons">
+            <button class="bigBtn" onclick="confirmAge()">
+                I AM 18+
+            </button>
+
+            <button class="bigBtn dark" onclick="logoutGame()">
+                EXIT
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================================
+     CHARACTER CREATOR
+================================ -->
+
+<div id="creator">
+
+    <div class="creatorWrap">
+
+        <div class="creatorTitle">
+            Create Your Character
+        </div>
+
+        <div class="creatorGrid">
+
+            <div class="characterPreview">
+
+                <div class="char">
+
+                    <div class="charHair" id="previewHair"></div>
+
+                    <div
+                        class="charHead"
+                        id="previewHead">
+                    </div>
+
+                    <div
+                        class="charBody"
+                        id="previewBody">
+                    </div>
+
+                    <div class="charLeg one"></div>
+                    <div class="charLeg two"></div>
+
+                </div>
+
+            </div>
+
+            <div class="options">
+
+                <h3>Character Details</h3>
+
+                <label>Name</label>
+                <input id="characterName"
+                       placeholder="Your character name">
+
+                <label>Life Path</label>
+
+                <div class="optionRow">
+
+                    <button
+                        class="option active"
+                        data-life="Student"
+                        onclick="chooseLife(this)">
+                        🎓 Student
+                    </button>
+
+                    <button
+                        class="option"
+                        data-life="Businessman"
+                        onclick="chooseLife(this)">
+                        💼 Businessman
+                    </button>
+
+                    <button
+                        class="option"
+                        data-life="Professional"
+                        onclick="chooseLife(this)">
+                        👔 Professional
+                    </button>
+
+                </div>
+
+                <label>Skin Tone</label>
+
+                <div class="optionRow">
+
+                    <button class="option active"
+                            onclick="setSkin(this,'#b8754f')">
+                        Tone 1
+                    </button>
+
+                    <button class="option"
+                            onclick="setSkin(this,'#8e5337')">
+                        Tone 2
+                    </button>
+
+                    <button class="option"
+                            onclick="setSkin(this,'#613523')">
+                        Tone 3
+                    </button>
+
+                    <button class="option"
+                            onclick="setSkin(this,'#d49a70')">
+                        Tone 4
+                    </button>
+
+                </div>
+
+                <label>Hair</label>
+
+                <div class="optionRow">
+
+                    <button class="option active"
+                            onclick="setHair(this,'#17110d', 'round')">
+                        Black
+                    </button>
+
+                    <button class="option"
+                            onclick="setHair(this,'#522f19','round')">
+                        Brown
+                    </button>
+
+                    <button class="option"
+                            onclick="setHair(this,'#b9853e','round')">
+                        Gold
+                    </button>
+
+                </div>
+
+                <label>Clothing</label>
+
+                <div class="optionRow">
+
+                    <button class="option active"
+                            onclick="setClothes(this,'#087f3f')">
+                        Abuja Green
+                    </button>
+
+                    <button class="option"
+                            onclick="setClothes(this,'#eeeeee')">
+                        White
+                    </button>
+
+                    <button class="option"
+                            onclick="setClothes(this,'#152d77')">
+                        Blue
+                    </button>
+
+                    <button class="option"
+                            onclick="setClothes(this,'#181818')">
+                        Black
+                    </button>
+
+                </div>
+
+                <label>University / Career</label>
+
+                <select id="careerChoice">
+                    <option>University of Abuja</option>
+                    <option>Baze University</option>
+                    <option>Nile University</option>
+                    <option>Business Owner</option>
+                    <option>Technology Professional</option>
+                    <option>Engineer</option>
+                    <option>Finance Professional</option>
+                </select>
+
+                <button
+                    class="btn"
+                    style="width:100%;margin-top:20px"
+                    onclick="finishCharacter()">
+                    ENTER ABUJA
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+/* ==========================================================
+   ABUJA LIFE
+   CORE GAME ENGINE
+========================================================== */
+
+const API = "";
+
+let userId =
+    localStorage.getItem("abujaLifeUserId");
+
+let user =
+    JSON.parse(
+        localStorage.getItem("abujaLifeUser") || "null"
+    );
+
+let player =
+    JSON.parse(
+        localStorage.getItem("abujaLifePlayer") || "null"
+    );
+
+let settings = {};
+
+let canvas =
+    document.getElementById("cityCanvas");
+
+let ctx =
+    canvas.getContext("2d");
+
+let keys = {};
+
+let gameStarted = false;
+
+let lastTime = 0;
+
+let playerCharacter = {
+
+    x: 850,
+    y: 650,
+
+    speed: 2.8,
+
+    direction: "down",
+
+    moving:false,
+
+    skin:"#b8754f",
+
+    hair:"#17110d",
+
+    clothes:"#087f3f",
+
+    lifePath:"Student",
+
+    name:"Player"
+
+};
+
+let camera = {
+    x:0,
+    y:0
+};
+
+let world = {
+    width:3000,
+    height:2200
+};
+
+let timeOfDay = 9;
+
+let currentVehicle = null;
+
+let driving = false;
+
+let vehicle = {
+
+    x:1000,
+    y:700,
+
+    type:"SUV",
+
+    speed:0,
+
+    maxSpeed:6,
+
+    angle:0,
+
+    occupied:false
+};
+
+let npcs = [];
+
+let locations = [];
+
+let vehicles = [];
+
+let nearbyObject = null;
+
+/* ==========================================================
+   INITIALIZATION
+========================================================== */
+
+window.addEventListener("load", async()=>{
+
+    resizeCanvas();
+
+    window.addEventListener("resize",resizeCanvas);
+
+    await loadGame();
+
+});
+
+async function loadGame(){
+
+    if(!userId){
+
+        window.location.href="/";
+
+        return;
+    }
+
+    try{
+
+        const response =
+            await fetch(
+                `/api/player/${userId}`
+            );
+
+        const data =
+            await response.json();
+
+        if(data.success){
+
+            player = data.player;
+
+            localStorage.setItem(
+                "abujaLifePlayer",
+                JSON.stringify(player)
+            );
+
+        }
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+    await loadWorldData();
+
+    updateHUD();
+
+    setTimeout(()=>{
+
+        document.getElementById("loading").style.display="none";
+
+        document.getElementById("game").style.display="block";
+
+        if(
+            !localStorage.getItem(
+                "abujaLifeAgeConfirmed"
+            )
+        ){
+
+            document.getElementById("intro").style.display="flex";
+
+        }else{
+
+            startCharacterCheck();
+
+        }
+
+    },700);
+
+}
+
+/* ==========================================================
+   BACKEND DATA
+========================================================== */
+
+async function fetchJSON(url){
+
+    try{
+
+        const response =
+            await fetch(url);
+
+        if(!response.ok)
+            throw new Error("Request failed");
+
+        return await response.json();
+
+    }catch(error){
+
+        console.log(error);
+
+        return {
+            success:false,
+            data:[]
+        };
+
+    }
+
+}
+
+async function loadWorldData(){
+
+    try{
+
+        const [
+            locationData,
+            jobsData,
+            propertiesData,
+            vehiclesData,
+            businessesData,
+            missionsData
+        ] = await Promise.all([
+
+            fetchJSON("/api/locations"),
+
+            fetchJSON("/api/jobs"),
+
+            fetchJSON("/api/properties"),
+
+            fetchJSON("/api/vehicles"),
+
+            fetchJSON("/api/businesses"),
+
+            fetchJSON("/api/missions")
+
+        ]);
+
+        locations =
+            locationData.data || [];
+
+        window.gameJobs =
+            jobsData.data || [];
+
+        window.gameProperties =
+            propertiesData.data || [];
+
+        window.gameVehicles =
+            vehiclesData.data || [];
+
+        window.gameBusinesses =
+            businessesData.data || [];
+
+        window.gameMissions =
+            missionsData.data || [];
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+    createNPCs();
+
+    createCityVehicles();
+
+}
+
+/* ==========================================================
+   AGE / CHARACTER
+========================================================== */
+
+function confirmAge(){
+
+    localStorage.setItem(
+        "abujaLifeAgeConfirmed",
+        "true"
+    );
+
+    document.getElementById("intro").style.display="none";
+
+    startCharacterCheck();
+
+}
+
+function startCharacterCheck(){
+
+    if(
+        !localStorage.getItem(
+            "abujaLifeCharacterCreated"
+        )
+    ){
+
+        document.getElementById(
+            "creator"
+        ).style.display="block";
+
+    }else{
+
+        beginGame();
+
+    }
+
+}
+
+function chooseLife(button){
+
+    document
+        .querySelectorAll("[data-life]")
+        .forEach(el=>el.classList.remove("active"));
+
+    button.classList.add("active");
+
+    playerCharacter.lifePath =
+        button.dataset.life;
+
+}
+
+function setSkin(button,color){
+
+    button.parentElement
+        .querySelectorAll(".option")
+        .forEach(el=>el.classList.remove("active"));
+
+    button.classList.add("active");
+
+    playerCharacter.skin=color;
+
+    document.getElementById(
+        "previewHead"
+    ).style.background=color;
+
+}
+
+function setHair(button,color){
+
+    button.parentElement
+        .querySelectorAll(".option")
+        .forEach(el=>el.classList.remove("active"));
+
+    button.classList.add("active");
+
+    playerCharacter.hair=color;
+
+    document.getElementById(
+        "previewHair"
+    ).style.background=color;
+
+}
+
+function setClothes(button,color){
+
+    button.parentElement
+        .querySelectorAll(".option")
+        .forEach(el=>el.classList.remove("active"));
+
+    button.classList.add("active");
+
+    playerCharacter.clothes=color;
+
+    document.getElementById(
+        "previewBody"
+    ).style.background=color;
+
+}
+
+function finishCharacter(){
+
+    const name =
+        document.getElementById(
+            "characterName"
+        ).value.trim();
+
+    if(name){
+
+        playerCharacter.name=name;
+
+    }else if(player?.display_name){
+
+        playerCharacter.name =
+            player.display_name;
+
+    }else{
+
+        playerCharacter.name="Player";
+
+    }
+
+    localStorage.setItem(
+        "abujaLifeCharacterCreated",
+        "true"
+    );
+
+    localStorage.setItem(
+        "abujaLifeCharacter",
+        JSON.stringify(playerCharacter)
+    );
+
+    document.getElementById(
+        "creator"
+    ).style.display="none";
+
+    beginGame();
+
+}
+
+/* ==========================================================
+   START GAME
+========================================================== */
+
+function beginGame(){
+
+    const saved =
+        localStorage.getItem(
+            "abujaLifeCharacter"
+        );
+
+    if(saved){
+
+        try{
+
+            playerCharacter =
+                {
+                    ...playerCharacter,
+                    ...JSON.parse(saved)
+                };
+
+        }catch(e){}
+
+    }
+
+    gameStarted=true;
+
+    updateHUD();
+
+    showToast(
+        "Welcome to Abuja. Your life starts now."
+    );
+
+    requestAnimationFrame(gameLoop);
+
+}
+
+/* ==========================================================
+   CANVAS
+========================================================== */
+
+function resizeCanvas(){
+
+    canvas.width =
+        window.innerWidth *
+        devicePixelRatio;
+
+    canvas.height =
+        window.innerHeight *
+        devicePixelRatio;
+
+    canvas.style.width =
+        window.innerWidth+"px";
+
+    canvas.style.height =
+        window.innerHeight+"px";
+
+    ctx.setTransform(
+        devicePixelRatio,
+        0,
+        0,
+        devicePixelRatio,
+        0,
+        0
+    );
+
+}
+
+/* ==========================================================
+   CITY
+========================================================== */
+
+const districts = [
+
+    {
+        name:"Wuse",
+        x:100,
+        y:100,
+        w:800,
+        h:550
+    },
+
+    {
+        name:"Garki",
+        x:100,
+        y:800,
+        w:750,
+        h:550
+    },
+
+    {
+        name:"Maitama",
+        x:1000,
+        y:100,
+        w:800,
+        h:600
+    },
+
+    {
+        name:"Asokoro",
+        x:1900,
+        y:120,
+        w:850,
+        h:600
+    },
+
+    {
+        name:"Jabi",
+        x:950,
+        y:850,
+        w:850,
+        h:600
+    },
+
+    {
+        name:"Gwarinpa",
+        x:1900,
+        y:850,
+        w:850,
+        h:650
+    },
+
+    {
+        name:"Airport",
+        x:1000,
+        y:1600,
+        w:1200,
+        h:400
+    }
+
+];
+
+function drawCity(){
+
+    ctx.clearRect(
+        0,
+        0,
+        window.innerWidth,
+        window.innerHeight
+    );
+
+    const night =
+        timeOfDay >= 19 ||
+        timeOfDay < 6;
+
+    /* sky / world */
+
+    ctx.fillStyle =
+        night
+        ? "#18251e"
+        : "#72976c";
+
+    ctx.fillRect(
+        0,
+        0,
+        window.innerWidth,
+        window.innerHeight
+    );
+
+    ctx.save();
+
+    ctx.translate(
+        -camera.x,
+        -camera.y
+    );
+
+    /* grass */
+
+    ctx.fillStyle =
+        night
+        ? "#263b2d"
+        : "#72976c";
+
+    ctx.fillRect(
+        0,
+        0,
+        world.width,
+        world.height
+    );
+
+    drawRoads();
+
+    drawDistricts();
+
+    drawBuildings();
+
+    drawLocations();
+
+    drawNPCs();
+
+    drawVehicles();
+
+    drawPlayer();
+
+    ctx.restore();
+
+    if(night){
+
+        ctx.fillStyle="rgba(0,10,20,.30)";
+
+        ctx.fillRect(
+            0,
+            0,
+            window.innerWidth,
+            window.innerHeight
+        );
+
+    }
+
+}
+
+function drawRoads(){
+
+    const roads=[
+
+        {
+            x:0,
+            y:650,
+            w:3000,
+            h:100
+        },
+
+        {
+            x:850,
+            y:0,
+            w:100,
+            h:2200
+        },
+
+        {
+            x:1800,
+            y:0,
+            w:100,
+            h:2200
+        },
+
+        {
+            x:0,
+            y:1500,
+            w:3000,
+            h:110
+        }
+
+    ];
+
+    roads.forEach(r=>{
+
+        ctx.fillStyle="#323b39";
+
+        ctx.fillRect(
+            r.x,
+            r.y,
+            r.w,
+            r.h
+        );
+
+        ctx.strokeStyle="#d7c979";
+        ctx.lineWidth=3;
+        ctx.setLineDash([25,20]);
+
+        if(r.w>r.h){
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                r.x,
+                r.y+r.h/2
+            );
+
+            ctx.lineTo(
+                r.x+r.w,
+                r.y+r.h/2
+            );
+
+            ctx.stroke();
+
+        }else{
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                r.x+r.w/2,
+                r.y
+            );
+
+            ctx.lineTo(
+                r.x+r.w/2,
+                r.y+r.h
+            );
+
+            ctx.stroke();
+
+        }
+
+    });
+
+    ctx.setLineDash([]);
+
+}
+
+/* ==========================================================
+   DISTRICTS
+========================================================== */
+
+function drawDistricts(){
+
+    districts.forEach(d=>{
+
+        ctx.strokeStyle=
+            "rgba(255,255,255,.12)";
+
+        ctx.lineWidth=2;
+
+        ctx.strokeRect(
+            d.x,
+            d.y,
+            d.w,
+            d.h
+        );
+
+        ctx.fillStyle=
+            "rgba(255,255,255,.12)";
+
+        ctx.font="bold 25px Arial";
+
+        ctx.fillText(
+            d.name,
+            d.x+20,
+            d.y+40
+        );
+
+    });
+
+}
+
+/* ==========================================================
+   BUILDINGS
+========================================================== */
+
+function drawBuildings(){
+
+    const buildings=[
+
+        [200,190,170,120],
+        [420,210,210,150],
+        [650,180,140,180],
+
+        [220,900,170,130],
+        [450,930,230,140],
+
+        [1100,190,220,150],
+        [1400,220,160,190],
+        [1580,180,150,130],
+
+        [2020,200,220,160],
+        [2300,230,180,130],
+
+        [1050,950,180,130],
+        [1300,1000,220,150],
+        [1550,930,170,180],
+
+        [2000,950,220,140],
+        [2300,980,200,160],
+        [2550,930,140,130]
+
+    ];
+
+    buildings.forEach((b,i)=>{
+
+        ctx.fillStyle =
+            i%3===0
+            ? "#d8d2c4"
+            : i%3===1
+            ? "#b9c6b7"
+            : "#d1bfa6";
+
+        ctx.fillRect(
+            b[0],
+            b[1],
+            b[2],
+            b[3]
+        );
+
+        ctx.fillStyle="#4d5b51";
+
+        for(
+            let x=b[0]+15;
+            x<b[0]+b[2]-15;
+            x+=35
+        ){
+
+            for(
+                let y=b[1]+20;
+                y<b[1]+b[3]-15;
+                y+=35
+            ){
+
+                ctx.fillRect(
+                    x,
+                    y,
+                    14,
+                    18
+                );
+
+            }
+
+        }
+
+    });
+
+}
+
+/* ==========================================================
+   LOCATIONS
+========================================================== */
+
+const cityLocations=[
+
+    {
+        name:"Wuse Market",
+        type:"market",
+        x:330,
+        y:500,
+        icon:"🛍️"
+    },
+
+    {
+        name:"Abuja Mall",
+        type:"shop",
+        x:620,
+        y:510,
+        icon:"🏬"
+    },
+
+    {
+        name:"Garki Hospital",
+        type:"hospital",
+        x:300,
+        y:1110,
+        icon:"🏥"
+    },
+
+    {
+        name:"Maitama Hotel",
+        type:"hotel",
+        x:1250,
+        y:480,
+        icon:"🏨"
+    },
+
+    {
+        name:"Asokoro Mansion District",
+        type:"property",
+        x:2200,
+        y:480,
+        icon:"🏡"
+    },
+
+    {
+        name:"Jabi Lake",
+        type:"lake",
+        x:1200,
+        y:1230,
+        icon:"🌊"
+    },
+
+    {
+        name:"Jabi Club",
+        type:"club",
+        x:1500,
+        y:1150,
+        icon:"🎵"
+    },
+
+    {
+        name:"Gwarinpa Business Hub",
+        type:"business",
+        x:2200,
+        y:1200,
+        icon:"🏢"
+    },
+
+    {
+        name:"University of Abuja",
+        type:"university",
+        x:1100,
+        y:1750,
+        icon:"🎓"
+    },
+
+    {
+        name:"Abuja International Airport",
+        type:"airport",
+        x:1750,
+        y:1780,
+        icon:"✈️"
+    },
+
+    {
+        name:"Luxury Auto Dealership",
+        type:"dealer",
+        x:2050,
+        y:1650,
+        icon:"🚗"
+    }
+
+];
+
+function drawLocations(){
+
+    cityLocations.forEach(l=>{
+
+        ctx.fillStyle="#092117";
+
+        ctx.beginPath();
+
+        ctx.roundRect(
+            l.x-45,
+            l.y-38,
+            90,
+            76,
+            14
+        );
+
+        ctx.fill();
+
+        ctx.font="28px Arial";
+
+        ctx.textAlign="center";
+
+        ctx.fillText(
+            l.icon,
+            l.x,
+            l.y-3
+        );
+
+        ctx.fillStyle="white";
+
+        ctx.font="11px Arial";
+
+        ctx.fillText(
+            l.name,
+            l.x,
+            l.y+25
+        );
+
+        ctx.textAlign="left";
+
+    });
+
+}
+
+/* ==========================================================
+   PLAYER
+========================================================== */
+
+function drawPlayer(){
+
+    const x=
+        playerCharacter.x;
+
+    const y=
+        playerCharacter.y;
+
+    ctx.save();
+
+    ctx.translate(x,y);
+
+    /* shadow */
+
+    ctx.fillStyle="rgba(0,0,0,.25)";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        0,
+        30,
+        25,
+        10,
+        0,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+    /* body */
+
+    ctx.fillStyle =
+        playerCharacter.clothes;
+
+    ctx.fillRect(
+        -17,
+        -2,
+        34,
+        48
+    );
+
+    /* legs */
+
+    ctx.fillStyle="#20262b";
+
+    ctx.fillRect(
+        -14,
+        44,
+        10,
+        27
+    );
+
+    ctx.fillRect(
+        4,
+        44,
+        10,
+        27
+    );
+
+    /* head */
+
+    ctx.fillStyle =
+        playerCharacter.skin;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        0,
+        -22,
+        22,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+    /* hair */
+
+    ctx.fillStyle =
+        playerCharacter.hair;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        0,
+        -31,
+        22,
+        Math.PI,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+    ctx.restore();
+
+}
+
+/* ==========================================================
+   NPCs
+========================================================== */
+
+function createNPCs(){
+
+    npcs=[];
+
+    const names=[
+        "Chidi",
+        "Aisha",
+        "Emeka",
+        "Fatima",
+        "David",
+        "Blessing",
+        "Tunde",
+        "Mary",
+        "Daniel",
+        "Ada",
+        "Ibrahim",
+        "Grace"
+    ];
+
+    for(let i=0;i<names.length;i++){
+
+        npcs.push({
+
+            name:names[i],
+
+            x:300+
+              Math.random()*2200,
+
+            y:250+
+              Math.random()*1250,
+
+            speed:
+              .3+
+              Math.random()*.7,
+
+            dir:
+              Math.random()*Math.PI*2,
+
+            color:
+              [
+                "#b8754f",
+                "#8e5337",
+                "#613523",
+                "#d49a70"
+              ][
+                Math.floor(Math.random()*4)
+              ],
+
+            clothes:
+              [
+                "#087f3f",
+                "#203b72",
+                "#8d2525",
+                "#ddd",
+                "#252525"
+              ][
+                Math.floor(Math.random()*5)
+              ]
+
+        });
+
+    }
+
+}
+
+function updateNPCs(){
+
+    npcs.forEach(npc=>{
+
+        if(Math.random()<.01){
+
+            npc.dir=
+                Math.random()*Math.PI*2;
+
+        }
+
+        npc.x +=
+            Math.cos(npc.dir)*
+            npc.speed;
+
+        npc.y +=
+            Math.sin(npc.dir)*
+            npc.speed;
+
+        npc.x=
+            Math.max(
+                30,
+                Math.min(
+                    world.width-30,
+                    npc.x
+                )
+            );
+
+        npc.y=
+            Math.max(
+                30,
+                Math.min(
+                    world.height-30,
+                    npc.y
+                )
+            );
+
+    });
+
+}
+
+function drawNPCs(){
+
+    npcs.forEach(npc=>{
+
+        ctx.save();
+
+        ctx.translate(
+            npc.x,
+            npc.y
+        );
+
+        ctx.fillStyle="rgba(0,0,0,.2)";
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            0,
+            27,
+            18,
+            7,
+            0,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+        ctx.fillStyle=npc.clothes;
+
+        ctx.fillRect(
+            -12,
+            0,
+            24,
+            35
+        );
+
+        ctx.fillStyle=npc.color;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            -14,
+            15,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+        ctx.fillStyle="#17110d";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            -20,
+            15,
+            Math.PI,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+        ctx.restore();
+
+    });
+
+}
+
+/* ==========================================================
+   VEHICLES
+========================================================== */
+
+function createCityVehicles(){
+
+    vehicles=[
+
+        {
+            x:700,
+            y:700,
+            type:"SUV",
+            color:"#111",
+            speed:0,
+            angle:0
+        },
+
+        {
+            x:1050,
+            y:750,
+            type:"Sports Car",
+            color:"#b21d29",
+            speed:0,
+            angle:0
+        },
+
+        {
+            x:1500,
+            y:700,
+            type:"Luxury Sedan",
+            color:"#ddd",
+            speed:0,
+            angle:0
+        },
+
+        {
+            x:1950,
+            y:760,
+            type:"Motorcycle",
+            color:"#222",
+            speed:0,
+            angle:0
+        },
+
+        {
+            x:2400,
+            y:760,
+            type:"SUV",
+            color:"#315b44",
+            speed:0,
+            angle:0
+        }
+
+    ];
+
+}
+
+function drawVehicles(){
+
+    vehicles.forEach(v=>{
+
+        ctx.save();
+
+        ctx.translate(
+            v.x,
+            v.y
+        );
+
+        ctx.rotate(v.angle);
+
+        if(v.type==="Motorcycle"){
+
+            ctx.fillStyle=v.color;
+
+            ctx.beginPath();
+
+            ctx.arc(
+                -13,
+                0,
+                7,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fill();
+
+            ctx.beginPath();
+
+            ctx.arc(
+                13,
+                0,
+                7,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fill();
+
+            ctx.fillRect(
+                -13,
+                -4,
+                26,
+                8
+            );
+
+        }else{
+
+            ctx.fillStyle=v.color;
+
+            ctx.roundRect(
+                -32,
+                -17,
+                64,
+                34,
+                8
+            );
+
+            ctx.fill();
+
+            ctx.fillStyle="#9bc7cf";
+
+            ctx.fillRect(
+                -17,
+                -12,
+                34,
+                10
+            );
+
+        }
+
+        ctx.restore();
+
+    });
+
+}
+
+/* ==========================================================
+   MOVEMENT
+========================================================== */
+
+function updatePlayer(){
+
+    if(driving){
+
+        updateVehicle();
+
+        return;
+
+    }
+
+    let dx=0;
+    let dy=0;
+
+    if(keys["ArrowUp"] || keys["w"])
+        dy=-1;
+
+    if(keys["ArrowDown"] || keys["s"])
+        dy=1;
+
+    if(keys["ArrowLeft"] || keys["a"])
+        dx=-1;
+
+    if(keys["ArrowRight"] || keys["d"])
+        dx=1;
+
+    if(dx!==0 || dy!==0){
+
+        const length=
+            Math.sqrt(dx*dx+dy*dy);
+
+        dx/=length;
+        dy/=length;
+
+        playerCharacter.x +=
+            dx*playerCharacter.speed;
+
+        playerCharacter.y +=
+            dy*playerCharacter.speed;
+
+        playerCharacter.moving=true;
+
+        if(Math.abs(dx)>Math.abs(dy)){
+
+            playerCharacter.direction=
+                dx>0
+                ?"right"
+                :"left";
+
+        }else{
+
+            playerCharacter.direction=
+                dy>0
+                ?"down"
+                :"up";
+
+        }
+
+    }else{
+
+        playerCharacter.moving=false;
+
+    }
+
+    playerCharacter.x=
+        Math.max(
+            20,
+            Math.min(
+                world.width-20,
+                playerCharacter.x
+            )
+        );
+
+    playerCharacter.y=
+        Math.max(
+            20,
+            Math.min(
+                world.height-20,
+                playerCharacter.y
+            )
+        );
+
+}
+
+/* ==========================================================
+   VEHICLE DRIVING
+========================================================== */
+
+function enterVehicle(){
+
+    if(driving){
+
+        exitVehicle();
+
+        return;
+    }
+
+    let nearest=null;
+
+    let distance=Infinity;
+
+    vehicles.forEach(v=>{
+
+        const d=
+            Math.hypot(
+                v.x-playerCharacter.x,
+                v.y-playerCharacter.y
+            );
+
+        if(d<distance){
+
+            distance=d;
+            nearest=v;
+
+        }
+
+    });
+
+    if(nearest && distance<90){
+
+        currentVehicle=nearest;
+
+        driving=true;
+
+        nearest.occupied=true;
+
+        showToast(
+            `You entered the ${nearest.type}.`
+        );
+
+    }else{
+
+        showToast(
+            "Move closer to a vehicle."
+        );
+
+    }
+
+}
+
+function exitVehicle(){
+
+    if(!currentVehicle)
+        return;
+
+    playerCharacter.x =
+        currentVehicle.x+50;
+
+    playerCharacter.y =
+        currentVehicle.y;
+
+    currentVehicle.occupied=false;
+
+    currentVehicle.speed=0;
+
+    driving=false;
+
+    showToast("You left the vehicle.");
+
+    currentVehicle=null;
+
+}
+
+function updateVehicle(){
+
+    if(!currentVehicle)
+        return;
+
+    let acceleration=0;
+
+    if(keys["ArrowUp"] || keys["w"])
+        acceleration=.15;
+
+    if(keys["ArrowDown"] || keys["s"])
+        acceleration=-.12;
+
+    currentVehicle.speed += acceleration;
+
+    currentVehicle.speed *= .97;
+
+    if(
+        keys["ArrowLeft"] ||
+        keys["a"]
+    ){
+
+        currentVehicle.angle-=.045;
+
+    }
+
+    if(
+        keys["ArrowRight"] ||
+        keys["d"]
+    ){
+
+        currentVehicle.angle+=.045;
+
+    }
+
+    currentVehicle.speed=
+        Math.max(
+            -2,
+            Math.min(
+                7,
+                currentVehicle.speed
+            )
+        );
+
+    currentVehicle.x +=
+        Math.cos(
+            currentVehicle.angle
+        )*
+        currentVehicle.speed;
+
+    currentVehicle.y +=
+        Math.sin(
+            currentVehicle.angle
+        )*
+        currentVehicle.speed;
+
+    currentVehicle.x=
+        Math.max(
+            20,
+            Math.min(
+                world.width-20,
+                currentVehicle.x
+            )
+        );
+
+    currentVehicle.y=
+        Math.max(
+            20,
+            Math.min(
+                world.height-20,
+                currentVehicle.y
+            )
+        );
+
+    playerCharacter.x=
+        currentVehicle.x;
+
+    playerCharacter.y=
+        currentVehicle.y;
+
+}
+
+/* ==========================================================
+   INTERACTION
+========================================================== */
+
+function interact(){
+
+    let closest=null;
+
+    let distance=Infinity;
+
+    cityLocations.forEach(l=>{
+
+        const d=
+            Math.hypot(
+                l.x-playerCharacter.x,
+                l.y-playerCharacter.y
+            );
+
+        if(d<distance){
+
+            distance=d;
+            closest=l;
+
+        }
+
+    });
+
+    if(closest && distance<120){
+
+        interactLocation(closest);
+
+        return;
+
+    }
+
+    let npc=null;
+
+    npcs.forEach(n=>{
+
+        const d=
+            Math.hypot(
+                n.x-playerCharacter.x,
+                n.y-playerCharacter.y
+            );
+
+        if(d<80){
+
+            npc=n;
+
+        }
+
+    });
+
+    if(npc){
+
+        npcConversation(npc);
+
+        return;
+
+    }
+
+    showToast(
+        "There is nothing to interact with here."
+    );
+
+}
+
+function interactLocation(location){
+
+    switch(location.type){
+
+        case"market":
+
+            openSystem("market");
+
+            break;
+
+        case"shop":
+
+            openSystem("market");
+
+            break;
+
+        case"hotel":
+
+            showToast(
+                "Welcome to Maitama Hotel."
+            );
+
+            break;
+
+        case"club":
+
+            showToast(
+                "🎵 Club night is getting started."
+            );
+
+            break;
+
+        case"university":
+
+            showToast(
+                "🎓 University campus."
+            );
+
+            break;
+
+        case"airport":
+
+            openSystem("routes");
+
+            break;
+
+        case"dealer":
+
+            openSystem("cars");
+
+            break;
+
+        case"business":
+
+            openSystem("business");
+
+            break;
+
+        case"property":
+
+            openSystem("properties");
+
+            break;
+
+        default:
+
+            showToast(
+                `You arrived at ${location.name}.`
+            );
+
+    }
+
+}
+
+function npcConversation(npc){
+
+    const lines=[
+
+        `Hey! I'm ${npc.name}. Nice to meet you.`,
+
+        `${npc.name}: Abuja is busy today!`,
+
+        `${npc.name}: Where are you heading?`,
+
+        `${npc.name}: Take care out there.`,
+
+        `${npc.name}: Maybe I'll see you around.`
+
+    ];
+
+    const line=
+        lines[
+            Math.floor(
+                Math.random()*lines.length
+            )
+        ];
+
+    showToast(line);
+
+}
+
+/* ==========================================================
+   CAMERA
+========================================================== */
+
+function updateCamera(){
+
+    camera.x=
+        playerCharacter.x -
+        window.innerWidth/2;
+
+    camera.y=
+        playerCharacter.y -
+        window.innerHeight/2;
+
+    camera.x=
+        Math.max(
+            0,
+            Math.min(
+                world.width-window.innerWidth,
+                camera.x
+            )
+        );
+
+    camera.y=
+        Math.max(
+            0,
+            Math.min(
+                world.height-window.innerHeight,
+                camera.y
+            )
+        );
+
+}
+
+/* ==========================================================
+   TIME
+========================================================== */
+
+function updateTime(delta){
+
+    timeOfDay +=
+        delta*0.0015;
+
+    if(timeOfDay>=24)
+        timeOfDay=0;
+
+}
+
+/* ==========================================================
+   GAME LOOP
+========================================================== */
+
+function gameLoop(timestamp){
+
+    if(!gameStarted)
+        return;
+
+    const delta=
+        timestamp-lastTime;
+
+    lastTime=timestamp;
+
+    updatePlayer();
+
+    updateNPCs();
+
+    updateCamera();
+
+    updateTime(delta);
+
+    drawCity();
+
+    updateLocationHUD();
+
+    requestAnimationFrame(gameLoop);
+
+}
+
+/* ==========================================================
+   LOCATION
+========================================================== */
+
+function getDistrict(){
+
+    for(const d of districts){
+
+        if(
+            playerCharacter.x>=d.x &&
+            playerCharacter.x<=d.x+d.w &&
+            playerCharacter.y>=d.y &&
+            playerCharacter.y<=d.y+d.h
+        ){
+
+            return d.name;
+
+        }
+
+    }
+
+    return "Abuja";
+
+}
+
+function updateLocationHUD(){
+
+    const district=
+        getDistrict();
+
+    document.getElementById(
+        "locationHud"
+    ).textContent =
+        `${district} • Abuja`;
+
+}
+
+/* ==========================================================
+   HUD
+========================================================== */
+
+function updateHUD(){
+
+    const username =
+        player?.username ||
+        player?.display_name ||
+        playerCharacter.name ||
+        "Player";
+
+    const balance =
+        Number(
+            player?.wallet?.balance ??
+            player?.balance ??
+            1000000
+        );
+
+    const level =
+        player?.level || 1;
+
+    document.getElementById(
+        "hudUsername"
+    ).textContent=username;
+
+    document.getElementById(
+        "phoneUser"
+    ).textContent="@"+username;
+
+    document.getElementById(
+        "hudLevel"
+    ).textContent=
+        `Level ${level}`;
+
+    document.getElementById(
+        "hudMoney"
+    ).textContent=
+        formatNaira(balance);
+
+    document.getElementById(
+        "hudHealth"
+    ).textContent=
+        player?.health ?? 100;
+
+    document.getElementById(
+        "hudEnergy"
+    ).textContent=
+        player?.energy ?? 100;
+
+}
+
+/* ==========================================================
+   PHONE
+========================================================== */
+
+document.getElementById(
+    "menuBtn"
+).onclick=togglePhone;
+
+function togglePhone(){
+
+    const phone =
+        document.getElementById(
+            "phone"
+        );
+
+    phone.style.display =
+        phone.style.display==="block"
+        ?"none"
+        :"block";
+
+}
+
+function closePhone(){
+
+    document.getElementById(
+        "phone"
+    ).style.display="none";
+
+}
+
+/* ==========================================================
+   SYSTEMS
+========================================================== */
+
+function openSystem(system){
+
+    closePhone();
+
+    document.getElementById(
+        "panel"
+    ).style.display="flex";
+
+    const title =
+        document.getElementById(
+            "panelTitle"
+        );
+
+    const body =
+        document.getElementById(
+            "panelBody"
+        );
+
+    const systems={
+
+        city:{
+
+            title:"🗺️ Abuja City",
+
+            html:`
+
+                <p>
+                Explore the Abuja world.
+                Choose a district to travel to.
+                </p>
+
+                <div class="grid">
+
+                ${districts.map(d=>`
+
+                    <div class="card">
+
+                        <h3>${d.name}</h3>
+
+                        <p>
+                        Explore streets, people,
+                        businesses and activities.
+                        </p>
+
+                        <button
+                          class="btn"
+                          onclick="travelTo('${d.name}')">
+                          Travel Here
+                        </button>
+
+                    </div>
+
+                `).join("")}
+
+                </div>
+            `
+
+        },
+
+        profile:{
+
+            title:"👤 My Profile",
+
+            html:`
+
+                <div class="grid">
+
+                    <div class="card">
+                        <h3>${playerCharacter.name}</h3>
+                        <p>
+                        Life Path:
+                        ${playerCharacter.lifePath}
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <h3>⭐ Reputation</h3>
+                        <p>
+                        ${player?.reputation ?? 0}
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <h3>🏆 Level</h3>
+                        <p>
+                        ${player?.level ?? 1}
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <h3>⚡ Energy</h3>
+                        <p>
+                        ${player?.energy ?? 100}
+                        </p>
+                    </div>
+
+                </div>
+
+            `
+
+        },
+
+        wallet:{
+
+            title:"💰 Wallet",
+
+            html:`
+
+                <div class="card">
+
+                    <h3>Available Balance</h3>
+
+                    <div style="
+                        font-size:30px;
+                        color:#59e995;
+                        font-weight:900;
+                        margin-top:10px
+                    ">
+                        ${document.getElementById("hudMoney").textContent}
+                    </div>
+
+                    <p style="margin-top:12px">
+                    This is virtual in-game currency.
+                    </p>
+
+                </div>
+
+                <div class="grid" style="margin-top:15px">
+
+                    <div class="card">
+                        <h3>💵 Total Earned</h3>
+                        <p>Track your game earnings.</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>🛒 Total Spent</h3>
+                        <p>Track your purchases.</p>
+                    </div>
+
+                </div>
+
+            `
+
+        },
+
+        jobs:{
+
+            title:"💼 Jobs",
+
+            html:`
+
+                <p>
+                Choose work and build your career.
+                </p>
+
+                <div class="grid">
+
+                ${
+                    (window.gameJobs || []).map(j=>`
+
+                    <div class="card">
+
+                        <h3>${j.title || j.name || "Job"}</h3>
+
+                        <p>
+                        ${j.description || "Available job in Abuja."}
+                        </p>
+
+                        <strong style="
+                          color:#63e69a;
+                          display:block;
+                          margin-top:8px
+                        ">
+                        ${j.salary
+                            ? formatNaira(j.salary)
+                            : "Earn XP + Cash"}
+                        </strong>
+
+                        <button
+                          class="btn"
+                          onclick="takeJob('${escapeJS(j.title || j.name || "Job")}')">
+                          Apply
+                        </button>
+
+                    </div>
+
+                    `).join("")
+                }
+
+                </div>
+
+            `
+
+        },
+
+        business:{
+
+            title:"🏢 Business",
+
+            html:`
+
+                <p>
+                Build your business empire across Abuja.
+                </p>
+
+                <div class="grid">
+
+                ${
+                    (window.gameBusinesses || []).map(b=>`
+
+                    <div class="card">
+
+                        <h3>${b.name || b.title || "Business"}</h3>
+
+                        <p>
+                        ${b.description || "Business opportunity."}
+                        </p>
+
+                        <button class="btn">
+                        View Business
+                        </button>
+
+                    </div>
+
+                    `).join("")
+                }
+
+                </div>
+
+            `
+
+        },
+
+        properties:{
+
+            title:"🏠 Properties",
+
+            html:`
+
+                <p>
+                Buy apartments, houses, mansions
+                and commercial properties.
+                </p>
+
+                <div class="grid">
+
+                ${
+                    (window.gameProperties || []).map(p=>`
+
+                    <div class="card">
+
+                        <h3>${p.name || p.title || "Property"}</h3>
+
+                        <p>
+                        ${p.location || "Abuja"}
+                        </p>
+
+                        <strong>
+                        ${
+                          p.price
+                          ? formatNaira(p.price)
+                          : "Price available"
+                        }
+                        </strong>
+
+                        <br>
+
+                        <button class="btn">
+                        View Property
+                        </button>
+
+                    </div>
+
+                    `).join("")
+                }
+
+                </div>
+
+            `
+
+        },
+
+        cars:{
+
+            title:"🚗 Cars & Dealership",
+
+            html:`
+
+                <p>
+                Buy cars, own them and use them
+                around Abuja.
+                </p>
+
+                <div class="grid">
+
+                ${
+                    (window.gameVehicles || []).map(v=>`
+
+                    <div class="card">
+
+                        <h3>
+                        🚗 ${v.name || v.title || "Vehicle"}
+                        </h3>
+
+                        <p>
+                        ${v.type || "Vehicle"}
+                        </p>
+
+                        <strong>
+                        ${
+                            v.price
+                            ? formatNaira(v.price)
+                            : "Price available"
+                        }
+                        </strong>
+
+                        <button
+                          class="btn"
+                          onclick="buyVehicle('${escapeJS(v.name || v.title || "Vehicle")}')">
+                          Purchase
+                        </button>
+
+                    </div>
+
+                    `).join("")
+                }
+
+                </div>
+
+            `
+
+        },
+
+        motorcycles:{
+
+            title:"🏍️ Motorcycles",
+
+            html:`
+
+                <div class="grid">
+
+                    <div class="card">
+                        <h3>🏍️ Street Bike</h3>
+                        <p>Fast city motorcycle.</p>
+                        <button class="btn"
+                         onclick="buyVehicle('Street Bike')">
+                         Buy
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <h3>🏍️ Sports Bike</h3>
+                        <p>High performance motorcycle.</p>
+                        <button class="btn"
+                         onclick="buyVehicle('Sports Bike')">
+                         Buy
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <h3>🏍️ Adventure Bike</h3>
+                        <p>Built for long trips.</p>
+                        <button class="btn"
+                         onclick="buyVehicle('Adventure Bike')">
+                         Buy
+                        </button>
+                    </div>
+
+                </div>
+
+            `
+
+        },
+
+        routes:{
+
+            title:"🛣️ Express Routes & Travel",
+
+            html:`
+
+                <p>
+                Travel around Nigeria and eventually
+                international destinations.
+                </p>
+
+                <div class="grid">
+
+                    <div class="card">
+                        <h3>🚗 Road</h3>
+                        <p>
+                        Abuja → Kaduna → Kano
+                        </p>
+                        <button class="btn"
+                         onclick="travelDestination('Kaduna')">
+                         Travel
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <h3>🚗 Road</h3>
+                        <p>
+                        Abuja → Port Harcourt
+                        </p>
+                        <button class="btn"
+                         onclick="travelDestination('Port Harcourt')">
+                         Travel
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <h3>✈️ Airport</h3>
+                        <p>
+                        Abuja → Lagos
+                        </p>
+                        <button class="btn"
+                         onclick="travelDestination('Lagos')">
+                         Fly
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <h3>🌍 International</h3>
+                        <p>
+                        Future international destinations.
+                        </p>
+                        <button class="btn secondary">
+                        Coming Soon
+                        </button>
+                    </div>
+
+                </div>
+
+            `
+
+        },
+
+        friends:{
+
+            title:"👥 Friends",
+
+            html:`
+
+                <label>Search player</label>
+
+                <input
+                    id="friendSearch"
+                    placeholder="Enter username">
+
+                <button
+                    class="btn"
+                    onclick="searchFriend()">
+                    Search
+                </button>
+
+                <div
+                    id="friendResult"
+                    style="margin-top:15px">
+                </div>
+
+            `
+
+        },
+
+        chat:{
+
+            title:"💬 Chat",
+
+            html:`
+
+                <div class="card">
+
+                    <h3>No conversations yet</h3>
+
+                    <p>
+                    Your private and group conversations
+                    will appear here.
+                    </p>
+
+                </div>
+
+                <button class="btn">
+                    Start New Chat
+                </button>
+
+            `
+
+        },
+
+        voice:{
+
+            title:"🎙️ Voice Messages",
+
+            html:`
+
+                <div class="card">
+
+                    <h3>Voice Messages</h3>
+
+                    <p>
+                    Voice messaging system is prepared
+                    for the social/multiplayer phase.
+                    </p>
+
+                    <button
+                      class="btn"
+                      onclick="showToast('Voice messaging will be connected in the social phase.')">
+                      🎙️ Record
+                    </button>
+
+                </div>
+
+            `
+
+        },
+
+        send:{
+
+            title:"💸 Send Money",
+
+            html:`
+
+                <div class="card">
+
+                    <p>
+                    Send virtual Abuja Life currency
+                    to another player.
+                    </p>
+
+                    <label>Recipient username</label>
+
+                    <input
+                      id="sendRecipient"
+                      placeholder="Username">
+
+                    <label>Amount</label>
+
+                    <input
+                      id="sendAmount"
+                      type="number"
+                      placeholder="Amount">
+
+                    <button
+                      class="btn"
+                      onclick="sendVirtualMoney()">
+                      Send Money
+                    </button>
+
+                </div>
+
+            `
+
+        },
+
+        missions:{
+
+            title:"🎯 Missions",
+
+            html:`
+
+                <div class="grid">
+
+                ${
+                    (window.gameMissions || []).map(m=>`
+
+                    <div class="card">
+
+                        <h3>
+                        🎯 ${m.title || m.name || "Mission"}
+                        </h3>
+
+                        <p>
+                        ${m.description || "Complete this mission."}
+                        </p>
+
+                        <button
+                          class="btn"
+                          onclick="startMission('${escapeJS(m.title || m.name || "Mission")}')">
+                          Start
+                        </button>
+
+                    </div>
+
+                    `).join("")
+                }
+
+                </div>
+
+            `
+
+        },
+
+        market:{
+
+            title:"🛍️ Marketplace",
+
+            html:`
+
+                <div class="grid">
+
+                    <div class="card">
+                        <h3>📱 Smartphone</h3>
+                        <p>Useful lifestyle item.</p>
+                        <button class="btn">
+                        Buy
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <h3>👕 Clothes</h3>
+                        <p>Upgrade your character style.</p>
+                        <button class="btn">
+                        Shop
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <h3>💎 Luxury Items</h3>
+                        <p>Premium lifestyle products.</p>
+                        <button class="btn">
+                        Shop
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <h3>🍔 Food</h3>
+                        <p>Keep your character energized.</p>
+                        <button class="btn">
+                        Buy
+                        </button>
+                    </div>
+
+                </div>
+
+            `
+
+        },
+
+        leaderboard:{
+
+            title:"🏆 Leaderboard",
+
+            html:`
+
+                <div class="grid">
+
+                    <div class="card">
+                        <h3>🥇 Richest Players</h3>
+                        <p>Top virtual fortunes.</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>⭐ Highest Level</h3>
+                        <p>Most experienced players.</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>🏢 Business Leaders</h3>
+                        <p>Top business owners.</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>🏎️ Luxury Collection</h3>
+                        <p>Players with the best garages.</p>
+                    </div>
+
+                </div>
+
+            `
+
+        },
+
+        events:{
+
+            title:"🎉 Abuja Events",
+
+            html:`
+
+                <div class="grid">
+
+                    <div class="card">
+                        <h3>🎵 Nightlife</h3>
+                        <p>
+                        Clubs, music and evening activities.
+                        </p>
+                        <button class="btn">
+                        Explore
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <h3>🏎️ Car Meet</h3>
+                        <p>
+                        Show off your vehicles.
+                        </p>
+                        <button class="btn">
+                        Join
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <h3>⚽ City Event</h3>
+                        <p>
+                        Meet other people around Abuja.
+                        </p>
+                        <button class="btn">
+                        Join
+                        </button>
+                    </div>
+
+                </div>
+
+            `
+
+        },
+
+        settings:{
+
+            title:"⚙️ Settings",
+
+            html:`
+
+                <div class="card">
+
+                    <h3>🔊 Audio</h3>
+
+                    <label>Music Volume</label>
+
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value="70">
+
+                    <label>Sound Effects</label>
+
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value="80">
+
+                    <label>Voice Volume</label>
+
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value="80">
+
+                </div>
+
+                <div class="card"
+                     style="margin-top:12px">
+
+                    <h3>🎮 Controls</h3>
+
+                    <p>
+                    Keyboard: W A S D / Arrow Keys
+                    </p>
+
+                    <p style="margin-top:5px">
+                    Mobile: On-screen controls
+                    </p>
+
+                </div>
+
+                <button
+                    class="btn danger"
+                    onclick="logoutGame()">
+                    Logout
+                </button>
+
+            `
+
+        }
+
+    };
+
+    const selected =
+        systems[system];
+
+    if(!selected)
+        return;
+
+    title.textContent =
+        selected.title;
+
+    body.innerHTML =
+        selected.html;
+
+}
+
+/* ==========================================================
+   TRAVEL
+========================================================== */
+
+function travelTo(name){
+
+    const destination =
+        districts.find(
+            d=>d.name===name
+        );
+
+    if(!destination)
+        return;
+
+    playerCharacter.x =
+        destination.x+
+        destination.w/2;
+
+    playerCharacter.y =
+        destination.y+
+        destination.h/2;
+
+    closePanel();
+
+    showToast(
+        `You travelled to ${name}.`
+    );
+
+}
+
+function travelDestination(name){
+
+    closePanel();
+
+    showToast(
+        `Preparing your journey to ${name}...`
+    );
+
+    setTimeout(()=>{
+
+        showToast(
+            `Travel system: ${name} route selected.`
+        );
+
+    },1500);
+
+}
+
+/* ==========================================================
+   ACTIONS
+========================================================== */
+
+function takeJob(name){
+
+    showToast(
+        `You applied for ${name}.`
+    );
+
+}
+
+function buyVehicle(name){
+
+    showToast(
+        `${name} added to your purchase options.`
+    );
+
+}
+
+function startMission(name){
+
+    closePanel();
+
+    showToast(
+        `Mission started: ${name}`
+    );
+
+}
+
+function searchFriend(){
+
+    const search =
+        document.getElementById(
+            "friendSearch"
+        ).value.trim();
+
+    document.getElementById(
+        "friendResult"
+    ).innerHTML=`
+
+        <div class="card">
+
+            <h3>🔎 Search</h3>
+
+            <p>
+            Looking for:
+            <strong>${escapeHTML(search)}</strong>
+            </p>
+
+            <button class="btn">
+            Add Friend
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+/* ==========================================================
+   SEND MONEY
+========================================================== */
+
+async function sendVirtualMoney(){
+
+    const recipient =
+        document.getElementById(
+            "sendRecipient"
+        ).value.trim();
+
+    const amount =
+        Number(
+            document.getElementById(
+                "sendAmount"
+            ).value
+        );
+
+    if(!recipient || !amount){
+
+        showToast(
+            "Enter recipient and amount."
+        );
+
+        return;
+
+    }
+
+    if(amount<=0){
+
+        showToast(
+            "Enter a valid amount."
+        );
+
+        return;
+
+    }
+
+    showToast(
+        "Transfer request prepared."
+    );
+
+}
+
+/* ==========================================================
+   PANEL
+========================================================== */
+
+function closePanel(){
+
+    document.getElementById(
+        "panel"
+    ).style.display="none";
+
+}
+
+/* ==========================================================
+   TOAST
+========================================================== */
+
+let toastTimer;
+
+function showToast(message){
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+    toast.textContent=message;
+
+    toast.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer=
+        setTimeout(()=>{
+
+            toast.classList.remove("show");
+
+        },3000);
+
+}
+
+/* ==========================================================
+   FORMAT
+========================================================== */
+
+function formatNaira(value){
+
+    return "₦"+
+        Number(value || 0)
+        .toLocaleString("en-NG");
+
+}
+
+function escapeHTML(value){
+
+    return String(value)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+function escapeJS(value){
+
+    return String(value)
+        .replaceAll("\\","\\\\")
+        .replaceAll("'","\\'");
+
+}
+
+/* ==========================================================
+   KEYBOARD
+========================================================== */
+
+window.addEventListener(
+    "keydown",
+    e=>{
+
+        keys[e.key]=true;
+
+        if(e.key==="e" || e.key==="E"){
+
+            interact();
+
+        }
+
+        if(e.key==="f" || e.key==="F"){
+
+            enterVehicle();
+
+        }
+
+        if(e.key==="Escape"){
+
+            closePanel();
+
+            closePhone();
+
+        }
+
+    }
+);
+
+window.addEventListener(
+    "keyup",
+    e=>{
+
+        keys[e.key]=false;
+
+    }
+);
+
+/* ==========================================================
+   MOBILE CONTROLS
+========================================================== */
+
+document
+    .querySelectorAll(".control")
+    .forEach(button=>{
+
+        const dir=
+            button.dataset.dir;
+
+        const keyMap={
+            up:"ArrowUp",
+            down:"ArrowDown",
+            left:"ArrowLeft",
+            right:"ArrowRight"
+        };
+
+        button.addEventListener(
+            "touchstart",
+            e=>{
+
+                e.preventDefault();
+
+                keys[keyMap[dir]]=true;
+
+            },
+            {passive:false}
+        );
+
+        button.addEventListener(
+            "touchend",
+            e=>{
+
+                e.preventDefault();
+
+                keys[keyMap[dir]]=false;
+
+            },
+            {passive:false}
+        );
+
+        button.addEventListener(
+            "mousedown",
+            ()=>{
+
+                keys[keyMap[dir]]=true;
+
+            }
+        );
+
+        button.addEventListener(
+            "mouseup",
+            ()=>{
+
+                keys[keyMap[dir]]=false;
+
+            }
+        );
+
+        button.addEventListener(
+            "mouseleave",
+            ()=>{
+
+                keys[keyMap[dir]]=false;
+
+            }
+        );
+
+    });
+
+/* ==========================================================
+   LOGOUT
+========================================================== */
+
+function logoutGame(){
+
+    localStorage.removeItem(
+        "abujaLifeUserId"
+    );
+
+    localStorage.removeItem(
+        "abujaLifeUser"
+    );
+
+    localStorage.removeItem(
+        "abujaLifePlayer"
+    );
+
+    localStorage.removeItem(
+        "abujaLifeSession"
+    );
+
+    window.location.href="/";
+
+}
+
+</script>
+
+</body>
+</html>
