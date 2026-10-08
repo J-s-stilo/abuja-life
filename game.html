@@ -62,7 +62,7 @@ KIND.forEach((row,bj)=>row.forEach((k,bi)=>{const bx=BL[bi],by=BL[bj];
  if(k==='park'){for(let i=0;i<22;i++)TR.push([bx+1+rnd()*9,by+1+rnd()*9])}
  else for(let q=0;q<4;q++){const x=bx+1+(q%2)*5,y=by+1+(q>>1)*5,dl=k==='dealer'&&q===0;
   const z=k==='office'?130+rnd()*80:k==='house'?70+rnd()*30:k==='warehouse'?50:dl?95:55+rnd()*25;
-  B.push({x,y,w:4,h:4,z:z|0,c:PAL[(rnd()*6)|0],k:dl?'dealer':k,nm:dl?'Wuse Luxury Motors':NAMES[k][q],dx:x+2,dy:y+4.6,door:dl})}
+  B.push({x,y,w:4,h:4,z:z|0,c:PAL[(rnd()*6)|0],k:dl?'dealer':k,nm:dl?'Wuse Luxury Motors':NAMES[k==='dealer'?'shop':k][q],dx:x+2,dy:y+4.6,door:dl})}
  TR.push([bx+.5,by+.5],[bx+10.5,by+10.5]);LP.push([bx+.5,by+5.5],[bx+10.5,by+5.5],[bx+5.5,by+.5],[bx+5.5,by+10.5])}));
 const blocked=(x,y)=>x<.4||y<.4||x>N-.4||y>N-.4||B.some(b=>x>b.x-.2&&x<b.x+b.w+.2&&y>b.y-.2&&y<b.y+b.h+.2);
 /* ---------- vehicles ---------- */
