@@ -90,9 +90,10 @@ const peds=['Chidi','Aisha','Emeka','Fatima','David','Blessing','Tunde','Ibrahim
 const PL=['Abuja is busy today!','Have you seen the cars at Wuse Luxury Motors?','Delivery jobs pay well, boss.','Mind the traffic!','Wuse market is lively today.'];
 /* ---------- net helpers ---------- */
 async function post(u,b){try{const r=await fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});let d={};try{d=await r.json()}catch(e){}return{s:r.status,d}}catch(e){return null}}
+const tf=u=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),4000);return fetch(u,{signal:c.signal}).finally(()=>clearTimeout(t))};
 async function load(){try{
- if(userId){const r=await fetch('/api/player/'+userId),d=await r.json();if(d.success){const p=d.player;uname=p.username||p.display_name||uname;bal=Number(p.wallet?.balance??p.balance??bal)}}
- const v=await (await fetch('/api/vehicles')).json();if(v.data&&v.data.length)CAT=v.data.slice(0,6).map((x,i)=>({id:x.id,name:x.name||x.title||'Vehicle',type:guess(x),price:+x.price||0,col:PC[i%8]}));
+ if(userId){const r=await tf('/api/player/'+userId),d=await r.json();if(d.success){const p=d.player;uname=p.username||p.display_name||uname;bal=Number(p.wallet?.balance??p.balance??bal)}}
+ const v=await (await tf('/api/vehicles')).json();if(v.data&&v.data.length)CAT=v.data.slice(0,6).map((x,i)=>({id:x.id,name:x.name||x.title||'Vehicle',type:guess(x),price:+x.price||0,col:PC[i%8]}));
 }catch(e){}hud()}
 /* ---------- UI ---------- */
 let tt;const toast=m=>{const t=$('toast');t.textContent=m;t.style.opacity=1;clearTimeout(tt);tt=setTimeout(()=>t.style.opacity=0,3000)};
@@ -235,5 +236,6 @@ function mini(){const w=mi.width,s=w/N;mg.fillStyle='#6f8f66';mg.fillRect(0,0,w,
  const t=MS.on?(MS.st?DR:PU):null;if(t){mg.fillStyle='#ffd447';mg.fillRect(t[0]*s-3,t[1]*s-3,6,6)}
  mg.fillStyle='#fff';mg.beginPath();mg.arc(P.x*s,P.y*s,3,0,7);mg.fill()}
 function frame(){requestAnimationFrame(frame);if(paused)return;T++;update();render()}
-load().then(()=>{setTimeout(()=>{$('ld').style.display='none';toast('Welcome to Wuse, '+uname+'. The dealership is right here — press E at its door.');hud();frame()},600)});
+addEventListener('error',e=>{$('ld').innerHTML='<div style="font-size:14px;padding:20px;text-align:center">Game error: '+e.message+'</div>'});
+Promise.race([load(),new Promise(r=>setTimeout(r,5000))]).then(()=>{setTimeout(()=>{$('ld').style.display='none';toast('Welcome to Wuse, '+uname+'. The dealership is right here — press E at its door.');hud();frame()},600)});
 </script></body></html>
