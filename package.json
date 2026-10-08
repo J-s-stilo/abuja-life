@@ -1,13 +1,13 @@
 {
   "name": "abuja-life",
   "version": "1.0.0",
-  "private": true,
-  "description": "ABUJA LIFE - Virtual Abuja Life Simulation",
+  "description": "Abuja Life - Open World Life Simulation Game",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "engines": {
-    "node": ">=20"
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.0",
+    "express": "^5.1.0"
   }
 }
