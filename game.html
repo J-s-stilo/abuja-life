@@ -62,8 +62,10 @@ KIND.forEach((row,bj)=>row.forEach((k,bi)=>{const bx=BL[bi],by=BL[bj];
  if(k==='park'){for(let i=0;i<22;i++)TR.push([bx+1+rnd()*9,by+1+rnd()*9])}
  else for(let q=0;q<4;q++){const x=bx+1+(q%2)*5,y=by+1+(q>>1)*5,dl=k==='dealer'&&q===0;
   const z=k==='office'?130+rnd()*80:k==='house'?70+rnd()*30:k==='warehouse'?50:dl?95:55+rnd()*25;
-  B.push({x,y,w:4,h:4,z:z|0,c:PAL[(rnd()*6)|0],k:dl?'dealer':k,nm:dl?'Wuse Luxury Motors':NAMES[k==='dealer'?'shop':k][q],dx:x+2,dy:y+4.6,door:dl})}
+  B.push({x,y,w:4,h:4,z:z|0,c:PAL[(rnd()*6)|0],k:dl?'dealer':k,nm:dl?'Wuse Luxury Motors':NAMES[k==='dealer'?'shop':k][q],dx:x+2,dy:y+4.6,door:dl||(k==='house'&&q===0)})}
  TR.push([bx+.5,by+.5],[bx+10.5,by+10.5]);LP.push([bx+.5,by+5.5],[bx+10.5,by+5.5],[bx+5.5,by+.5],[bx+5.5,by+10.5])}));
+// A dedicated starter apartment sits near the Wuse spawn point.
+B.push({x:9,y:18,w:3.5,h:3.5,z:68,c:[214,190,160],k:'house',nm:'Your Starter Apartment',dx:10.75,dy:22.1,door:true});
 const blocked=(x,y)=>x<.4||y<.4||x>N-.4||y>N-.4||B.some(b=>x>b.x-.2&&x<b.x+b.w+.2&&y>b.y-.2&&y<b.y+b.h+.2);
 /* ---------- vehicles ---------- */
 const SH={moto:{l:.8,w:.28,h:7,ch:3},eco:{l:1.05,w:.58,h:9,ch:8},sedan:{l:1.3,w:.62,h:9,ch:8},suv:{l:1.35,w:.7,h:12,ch:10},sport:{l:1.35,w:.66,h:7,ch:6},van:{l:1.6,w:.7,h:16,ch:8},bus:{l:2.6,w:.8,h:24,ch:0},truck:{l:2.1,w:.74,h:18,ch:10}};
@@ -83,29 +85,32 @@ let userId=localStorage.getItem('abujaLifeUserId'),bal=1000000,uname='Boss',ch={
 try{ch=JSON.parse(localStorage.getItem('abujaLifeCharacter')||'{}')}catch(e){}
 const SK=ch.skin||'#b8754f',HR=ch.hair||'#17110d',CL=ch.clothes||'#087f3f';
 const P={x:6,y:22.8,fc:'d',mv:false},IP={x:6,y:8},cam={x:0,y:0};
-let inside=null,T=0,paused=false,mmBig=false;
+let inside=null,insideType='dealer',T=0,paused=false,mmBig=false,houseStyle=0;
 const joy={x:0,y:0},K={};
 const MS={on:0,st:0},PU=[36.5,8.5],DR=[8.5,36.5];
 const peds=['Chidi','Aisha','Emeka','Fatima','David','Blessing','Tunde','Ibrahim','Grace','Ada'].map((n,i)=>({n,bx:BL[i%3],by:BL[(i/3|0)%3],s:rnd()*40,v:.012+rnd()*.012,cw:rnd()<.5?1:-1,col:['#087f3f','#203b72','#8d2525','#ddd','#444'][i%5],sk:['#b8754f','#8e5337','#613523','#d49a70'][i%4],ph:rnd()*6,x:0,y:0,fc:'d'}));
 const PL=['Abuja is busy today!','Have you seen the cars at Wuse Luxury Motors?','Delivery jobs pay well, boss.','Mind the traffic!','Wuse market is lively today.'];
 /* ---------- net helpers ---------- */
-async function post(u,b){try{const r=await fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});let d={};try{d=await r.json()}catch(e){}return{s:r.status,d}}catch(e){return null}}
+async function post(u,b){try{let token='';try{const sess=JSON.parse(localStorage.getItem('abujaLifeSession')||'{}');token=sess.session?.access_token||sess.access_token||sess.data?.session?.access_token||''}catch(e){}const headers={'Content-Type':'application/json'};if(token)headers.Authorization='Bearer '+token;const r=await fetch(u,{method:'POST',headers,body:JSON.stringify(b)});let d={};try{d=await r.json()}catch(e){}return{s:r.status,d}}catch(e){return null}}
 const tf=u=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),4000);return fetch(u,{signal:c.signal}).finally(()=>clearTimeout(t))};
 async function load(){try{
- if(userId){const r=await tf('/api/player/'+userId),d=await r.json();if(d.success){const p=d.player;uname=p.username||p.display_name||uname;bal=Number(p.wallet?.balance??p.balance??bal)}}
+ if(userId){const r=await tf('/api/player/'+encodeURIComponent(userId)),d=await r.json();if(d.success){const p=d.player||{},profile=p.profile||p;uname=profile.username||profile.display_name||uname;bal=Number(p.wallet?.balance??profile.balance??bal);if(profile.character&&typeof profile.character==='object')ch=profile.character;}}
  const v=await (await tf('/api/vehicles')).json();if(v.data&&v.data.length)CAT=v.data.slice(0,6).map((x,i)=>({id:x.id,name:x.name||x.title||'Vehicle',type:guess(x),price:+x.price||0,col:PC[i%8]}));
-}catch(e){}hud()}
+}catch(e){toast('Could not reach the game server. Playing in local exploration mode; purchases and rewards will not be credited offline.')}hud()}
 /* ---------- UI ---------- */
 let tt;const toast=m=>{const t=$('toast');t.textContent=m;t.style.opacity=1;clearTimeout(tt);tt=setTimeout(()=>t.style.opacity=0,3000)};
-function hud(){$('nm').textContent=uname;$('bal').textContent=fmt(bal);$('lv').textContent=inside?'Showroom':'Wuse • Abuja';const m=$('ms');if(MS.on){m.style.display='block';m.textContent=MS.st?'📦 Deliver the package → Gwarinpa side (yellow dot)':'📦 Collect the package (yellow dot)'}else m.style.display='none'}
+function hud(){$('nm').textContent=uname;$('bal').textContent=fmt(bal);$('lv').textContent=inside?(insideType==='home'?'Your Home':'Wuse Motors'):districtAt(P.x,P.y)+' • Abuja';const m=$('ms');if(MS.on){m.style.display='block';m.textContent=MS.st?'📦 Deliver the package → Gwarinpa side (yellow dot)':'📦 Collect the package (yellow dot)'}else m.style.display='none'}
 function showP(t,h){$('pt').textContent=t;$('pc').innerHTML=h;$('pan').style.display='flex'}
 function closeP(){$('pan').style.display='none'}
 $('mM').onclick=()=>{mmBig=!mmBig;mi.width=mi.height=mmBig?260:100};
-$('mI').onclick=()=>showP('🎒 Inventory','<b>Vehicles</b><br>'+(owned.length?owned.map(o=>'🚗 '+o.name).join('<br>'):'None yet — visit Wuse Luxury Motors.')+'<br><br><b>Properties</b><br>None yet.');
-$('mP').onclick=()=>showP('👤 Profile',`<b>${uname}</b><br>Balance: ${fmt(bal)}<br>Vehicles owned: ${owned.length}<br><button class="btn" onclick="startM()">📦 Start delivery job</button>`);
+$('mI').onclick=()=>showP('🎒 Inventory','<b>Vehicles</b><br>'+(owned.length?owned.map(o=>'🚗 '+o.name).join('<br>'):'No vehicles purchased in this session.')+'<br><br><b>Home</b><br>Visit a green-roof residence in Wuse to enter your personal starter apartment. Furniture and property persistence will be connected after the database schema is confirmed.');
+$('mP').onclick=()=>showP('👤 Character & Profile',`<b>${uname}</b><br>Balance: ${fmt(bal)}<br>Vehicles owned this session: ${owned.length}<hr style="margin:10px 0;border-color:#ffffff22"><label>Skin <select id="skinPick" style="padding:8px;width:100%;margin:5px 0"><option value="#b8754f">Warm brown</option><option value="#8e5337">Deep brown</option><option value="#d49a70">Light brown</option><option value="#613523">Dark brown</option></select></label><label>Hair <select id="hairPick" style="padding:8px;width:100%;margin:5px 0"><option value="#17110d">Black</option><option value="#3c2415">Dark brown</option><option value="#8b5a2b">Brown</option><option value="#b5a08a">Blonde</option></select></label><label>Outfit <select id="clothPick" style="padding:8px;width:100%;margin:5px 0"><option value="#087f3f">Abuja green</option><option value="#203b72">Navy</option><option value="#8d2525">Burgundy</option><option value="#ddd">White</option><option value="#d3a329">Gold</option></select></label><button class="btn" onclick="saveLook()">Save look</button><button class="btn" onclick="startM()">📦 Start delivery job</button>`);setTimeout(()=>{if($('skinPick'))$('skinPick').value=ch.skin||SK;if($('hairPick'))$('hairPick').value=ch.hair||HR;if($('clothPick'))$('clothPick').value=ch.clothes||CL},0);
 $('mS').onclick=()=>showP('⚙️ Settings','Keyboard: WASD/arrows, E act, F vehicle, Shift run.<br><button class="btn" onclick="pause()">Pause</button><button class="btn d" onclick="logout()">Logout</button>');
 function pause(){paused=!paused;closeP();$('pz').style.display=paused?'flex':'none'}
 $('pz').onclick=pause;
+function setHouseStyle(n){houseStyle=n;toast(n?'Minimal style selected':'Warm modern style selected');closeP()}
+function saveLook(){ch={...ch,skin:$('skinPick').value,hair:$('hairPick').value,clothes:$('clothPick').value};localStorage.setItem('abujaLifeCharacter',JSON.stringify(ch));toast('Character appearance saved on this device.');closeP()}
+function districtAt(x,y){if(x>29&&y<14)return 'Maitama';if(x<13&&y>29)return 'Garki';if(x>28&&y>28)return 'Gwarinpa';if(x>14&&x<28&&y>14&&y<28)return 'Central Area';if(x>28&&y<14)return 'Jabi';return 'Wuse'}
 function logout(){['abujaLifeUserId','abujaLifeUser','abujaLifePlayer','abujaLifeSession'].forEach(k=>localStorage.removeItem(k));location.href='/'}
 /* ---------- input ---------- */
 addEventListener('keydown',e=>{K[e.key.toLowerCase()]=1;if(e.key==='e'||e.key==='E')act();if(e.key==='f'||e.key==='F')veh();if(e.key==='Escape')closeP()});
@@ -120,12 +125,11 @@ function inp(){let x=joy.x,y=joy.y;if(Math.hypot(x,y)<.15)x=y=0;if(K.arrowleft||
 /* ---------- interaction ---------- */
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 function nearest(){
- if(inside){if(IP.y>8.2)return{t:'Exit showroom',f:()=>{inside=null;hud()}};
-  const i=CAT.findIndex((c,i)=>Math.hypot(IP.x-(2.5+(i%3)*3.5),IP.y-(2.5+(i>>1>0&&i>2?3:0)))<1.7);
-  const j=CAT.findIndex((c,i)=>Math.hypot(IP.x-slot(i)[0],IP.y-slot(i)[1])<1.7);
-  return j>=0?{t:'Inspect '+CAT[j].name,f:()=>offer(j)}:null}
+ if(inside){if(IP.y>8.2)return{t:insideType==='home'?'Leave your home':'Exit showroom',f:()=>{inside=null;insideType='dealer';hud()}};
+  if(insideType==='home'){if(Math.hypot(IP.x-3,IP.y-3)<1.8)return{t:'Sleep and restore energy',f:()=>{toast('You rested at home. Energy restored for this session.');closeP()}};if(Math.hypot(IP.x-8.5,IP.y-3)<1.8)return{t:'Change outfit',f:()=>{$('mP').click()}};if(Math.hypot(IP.x-6,IP.y-5.8)<1.8)return{t:'Decorate your home',f:()=>showP('🛋️ Home Decor','Choose a room style for this session.<br><button class="btn" onclick="setHouseStyle(0)">Warm modern</button><button class="btn" onclick="setHouseStyle(1)">Minimal</button><p style="margin-top:8px;color:#b7c8bd">Room design currently saves for this play session only.</p>')};return null}
+  const j=CAT.findIndex((c,i)=>Math.hypot(IP.x-slot(i)[0],IP.y-slot(i)[1])<1.7);return j>=0?{t:'Inspect '+CAT[j].name,f:()=>offer(j)}:null}
  if(drv)return{t:'Exit vehicle',f:veh};
- const bd=B.find(b=>b.door&&Math.hypot(P.x-b.dx,P.y-b.dy)<1.4);if(bd)return{t:'Enter '+bd.nm,f:()=>{inside=bd;IP.x=6;IP.y=8;hud()}};
+ const bd=B.find(b=>b.door&&Math.hypot(P.x-b.dx,P.y-b.dy)<1.8);if(bd)return{t:bd.k==='house'?'Enter your starter home':'Enter '+bd.nm,f:()=>{inside=bd;insideType=bd.k==='house'?'home':'dealer';IP.x=6;IP.y=7.7;hud();toast(insideType==='home'?'Welcome home. Explore your apartment.':'Welcome to Wuse Luxury Motors.')}};
  const pd=peds.find(p=>dist(P,p)<1.4);if(pd)return{t:'Talk to '+pd.n,f:()=>toast(pd.n+': '+PL[(Math.random()*5)|0])};
  const cr=cars.filter(c=>dist(P,c)<1.9).sort((a,b)=>dist(P,a)-dist(P,b))[0];if(cr)return{t:'Enter vehicle (F)',f:()=>enter(cr)};
  return null}
@@ -135,14 +139,10 @@ function veh(){if(paused||inside)return;if(drv){const c=drv;for(const[ox,oy]of[[
 function enter(c){drv=c;c.ai=false;c.v=0;c.sp=0;toast('Driving '+c.type+' — ↑ accelerate, ←/→ steer, ↓ brake')}
 const slot=i=>[2.5+(i%3)*3.5,i<3?2.6:5.6];
 function offer(j){const v=CAT[j],ok=bal>=v.price;showP(v.name,`Type: ${v.type}<br>Price: <b>${fmt(v.price)}</b><br>Your balance: ${fmt(bal)}<br>${ok?'':'<span style="color:#ff6b78">Insufficient funds for this vehicle.</span><br>'}<button class="btn" onclick="buy(${j})">Purchase</button>`)}
-async function buy(j){const v=CAT[j];closeP();if(bal<v.price)return toast('Insufficient funds.');
- const r=await post('/api/vehicles/buy',{userId,vehicleId:v.id});
- if(r&&r.s!==404){if(r.d.success){bal=Number(r.d.balance??bal-v.price);got(v)}else toast(r.d.message||r.d.error||'Purchase failed.');return}
- bal-=v.price;got(v);toast('Demo mode: /api/vehicles/buy not found, so this purchase is not saved.')}
+async function buy(j){const v=CAT[j];if(!userId)return toast('Log in to buy vehicles.');if(bal<v.price)return toast('Insufficient funds.');closeP();const r=await post('/api/vehicles/buy',{userId,vehicleId:v.id});if(!r)return toast('Server unavailable. No money was deducted.');if(r.d&&r.d.success){bal=Number(r.d.balance??bal-v.price);got(v)}else toast(r.d.message||r.d.error||'Purchase is not available yet. No money was deducted.')}
 function got(v){owned.push(v);cars.push(mk({type:v.type,col:v.col,x:11+owned.length*1.2,y:22.5,a:0}));hud();toast('You bought '+v.name+'! It is parked outside the dealership.')}
 function startM(){MS.on=1;MS.st=0;closeP();hud();toast('Delivery started. Follow the yellow dot on the map.')}
-async function doneM(){MS.on=0;const r=await post('/api/missions/complete',{userId,mission:'delivery_1'});
- if(r&&r.s!==404&&r.d.success)bal=Number(r.d.balance??bal+25000);else bal+=25000;hud();toast('Delivery complete! +₦25,000')}
+async function doneM(){const r=await post('/api/missions/complete',{userId,mission:'delivery_1'});if(r&&r.d&&r.d.success){MS.on=0;bal=Number(r.d.balance??bal);hud();toast('Delivery complete! '+(r.d.reward?('+'+fmt(r.d.reward)):'Reward credited.'))}else{MS.on=0;hud();toast('Delivery completed, but the server has not confirmed a reward. No money was added.')}}
 /* ---------- update ---------- */
 function move(p,lim){const[ix,iy]=inp();if(ix||iy){const sp=(K.shift?.055:.034),wx=ix+iy,wy=iy-ix,nx=p.x+wx*sp,ny=p.y+wy*sp;
  if(lim){p.x=Math.max(.5,Math.min(11.5,nx));p.y=Math.max(.5,Math.min(8.4,ny))}else{if(!blocked(nx,p.y))p.x=nx;if(!blocked(p.x,ny))p.y=ny}
@@ -206,6 +206,8 @@ function lamp(x,y){const[s,t]=iso(x,y);g.fillStyle='#444';g.fillRect(s-1,t-36,2,
 function sig(rx,ry){const[s,t]=iso(rx+3.3,ry+3.3),ph=Math.floor(T/360)%2;g.fillStyle='#333';g.fillRect(s-1,t-26,2,26);
  g.fillStyle=ph?'#e33':'#3d3';g.beginPath();g.arc(s-4,t-28,3,0,7);g.fill();g.fillStyle=ph?'#3d3':'#e33';g.beginPath();g.arc(s+4,t-28,3,0,7);g.fill()}
 function renderOut(){
+ // A distant Central Area skyline gives the neighbourhood a recognisable Abuja silhouette.
+ for(let i=0;i<9;i++){const x=18+i*1.25,y=17+(i%3)*.8,h=115+(i%4)*28;const q=iso(x,y);if(Math.abs(q[0]-cam.x)<W*.7){prism([[x,y],[x+.72,y],[x+.72,y+.72],[x,y+.72]],0,h,[126+i*5,145+i*3,153+i*4]);for(let f=24;f<h-10;f+=24){const z=iso(x+.35,y,f);g.fillStyle='#d4e5df';g.fillRect(z[0]-3,z[1]-4,5,8)}}}
  for(let x=0;x<N;x++)for(let y=0;y<N;y++){if(!vis(x+.5,y+.5,40))continue;
   tile(x,y,onR(x)||onR(y)?'#343c3b':(onR(x-1)||onR(x+1)||onR(y-1)||onR(y+1))?'#b4b7ad':(x>=17&&x<28&&y>=17&&y<28)?'#4f8a4a':'#8f9d8a')}
  g.strokeStyle='#d7c979';g.lineWidth=2;g.setLineDash([14,12]);
@@ -217,17 +219,21 @@ function renderOut(){
  R.forEach(rx=>R.forEach(ry=>{if(vis(rx+2,ry+2,60))L.push({d:rx+ry+6.6,f:()=>sig(rx,ry)})}));
  cars.forEach(c=>{if(vis(c.x,c.y,80))L.push({d:c.x+c.y,f:()=>car(c.x,c.y,c.a,c.col,c.s)})});
  peds.forEach(p=>{if(vis(p.x,p.y,80))L.push({d:p.x+p.y,f:()=>person(p)})});
- if(!drv)L.push({d:P.x+P.y,f:()=>person({x:P.x,y:P.y,fc:P.fc,mv:P.mv},uname)});
+ if(!drv)L.push({d:P.x+P.y,f:()=>person({x:P.x,y:P.y,fc:P.fc,mv:P.mv,sk:ch.skin||SK,hr:ch.hair||HR,col:ch.clothes||CL},uname)});
  const tg=MS.on?(MS.st?DR:PU):null;if(tg)L.push({d:tg[0]+tg[1],f:()=>{const[s,t]=iso(tg[0],tg[1]),b=Math.sin(T*.1)*5;g.fillStyle='rgba(255,212,71,.35)';g.fillRect(s-5,t-120,10,120);g.fillStyle='#ffd447';g.beginPath();g.moveTo(s,t-60+b);g.lineTo(s+10,t-72+b);g.lineTo(s,t-84+b);g.lineTo(s-10,t-72+b);g.fill()}});
  L.sort((a,b)=>a.d-b.d).forEach(o=>o.f())}
 function renderIn(){const IW=12,IH=9;
- for(let x=0;x<IW;x++)for(let y=0;y<IH;y++)tile(x,y,(x+y)%2?'#c9c3b4':'#ddd7c8');
- poly([iso(0,0,0),iso(IW,0,0),iso(IW,0,110),iso(0,0,110)],'#2d5a43');poly([iso(0,0,0),iso(0,IH,0),iso(0,IH,110),iso(0,0,110)],'#244b37');
- const s=iso(IW/2,0,85);g.fillStyle='#ffd447';g.font='bold 20px Arial';g.textAlign='center';g.fillText('WUSE LUXURY MOTORS',s[0],s[1]);
- const ex=iso(6,IH);g.fillStyle='#fff';g.font='12px Arial';g.fillText('▼ EXIT',ex[0],ex[1]+14);g.textAlign='left';
- const L=[];CAT.forEach((v,i)=>{const[x,y]=slot(i);L.push({d:x+y,f:()=>{poly([iso(x-1,y-.8),iso(x+1,y-.8),iso(x+1,y+.8),iso(x-1,y+.8)],'#7b8f84');car(x,y,1,v.col,SH[v.type]);
-  const t=iso(x,y,48);g.fillStyle='#fff';g.font='bold 10px Arial';g.textAlign='center';g.fillText(v.name,t[0],t[1]);g.fillStyle='#63e69a';g.fillText(fmt(v.price),t[0],t[1]+12);g.textAlign='left'}})});
- L.push({d:IP.x+IP.y,f:()=>person({x:IP.x,y:IP.y,fc:IP.fc||'u',mv:IP.mv},uname)});L.sort((a,b)=>a.d-b.d).forEach(o=>o.f())}
+ for(let x=0;x<IW;x++)for(let y=0;y<IH;y++)tile(x,y,insideType==='home'?((x+y)%2?(houseStyle?'#d8d9d4':'#d6c8ae'):(houseStyle?'#c4c8c3':'#bfa98c')):((x+y)%2?'#c9c3b4':'#ddd7c8'));
+ const wall=insideType==='home'?'#a77b52':'#2d5a43';poly([iso(0,0,0),iso(IW,0,0),iso(IW,0,110),iso(0,0,110)],wall);poly([iso(0,0,0),iso(0,IH,0),iso(0,IH,110),iso(0,0,110)],insideType==='home'?'#78563e':'#244b37');
+ const s=iso(IW/2,0,85);g.fillStyle='#ffd447';g.font='bold 20px Arial';g.textAlign='center';g.fillText(insideType==='home'?'YOUR WUSE APARTMENT':'WUSE LUXURY MOTORS',s[0],s[1]);
+ if(insideType==='home'){
+  // Furniture is drawn as dimensional pieces rather than flat UI panels.
+  prism([[1.4,1.5],[4.3,1.5],[4.3,2.7],[1.4,2.7]],3,14,houseStyle?[100,123,121]:[163,108,73]);prism([[1.7,1.7],[4,1.7],[4,2.5],[1.7,2.5]],14,18,'#e4d6c0');
+  prism([[7.1,1.3],[9.8,1.3],[9.8,2.1],[7.1,2.1]],3,9,[90,57,39]);prism([[7.2,1.4],[9.7,1.4],[9.7,2],[7.2,2]],9,13,[238,229,213]);
+  prism([[4.8,5.3],[7.1,5.3],[7.1,6.1],[4.8,6.1]],3,10,[106,66,41]);prism([[5,5.4],[6.9,5.4],[6.9,6],[5,6]],10,12,[200,167,123]);
+  const a=iso(3,3,24);g.fillStyle='#fff';g.font='bold 10px Arial';g.fillText('BED',a[0],a[1]);const b=iso(8.4,3,18);g.fillText('WARDROBE',b[0],b[1]);const c=iso(6,5.7,20);g.fillText('LIVING ROOM',c[0],c[1]);
+ }else{const L=[];CAT.forEach((v,i)=>{const[x,y]=slot(i);L.push({d:x+y,f:()=>{poly([iso(x-1,y-.8),iso(x+1,y-.8),iso(x+1,y+.8),iso(x-1,y+.8)],'#7b8f84');car(x,y,1,v.col,SH[v.type]);const t=iso(x,y,48);g.fillStyle='#fff';g.font='bold 10px Arial';g.textAlign='center';g.fillText(v.name,t[0],t[1]);g.fillStyle='#63e69a';g.fillText(fmt(v.price),t[0],t[1]+12);g.textAlign='left'}})});L.sort((a,b)=>a.d-b.d).forEach(o=>o.f())}
+ const ex=iso(6,IH);g.fillStyle='#fff';g.font='bold 12px Arial';g.fillText('▼ EXIT',ex[0],ex[1]+14);g.textAlign='left';person({x:IP.x,y:IP.y,fc:IP.fc||'u',mv:IP.mv},uname)}
 function render(){g.setTransform(D,0,0,D,0,0);g.fillStyle='#2c4a35';g.fillRect(0,0,W,H);
  g.save();g.translate(W/2-cam.x,H*.55-cam.y);inside?renderIn():renderOut();g.restore();
  const n=inside?0:night();if(n>0){g.fillStyle=`rgba(8,12,50,${n})`;g.fillRect(0,0,W,H)}}
