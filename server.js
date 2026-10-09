@@ -594,6 +594,68 @@ app.get("/api/admin/transactions", async (req, res) => {
 });
 
 /* ==========================================
+   SECURE GAMEPLAY ACTIONS
+   These write operations require the Supabase access token saved at login.
+   Run migrations/001_gameplay_economy.sql before enabling them.
+========================================== */
+async function requirePlayer(req, res) {
+  const header = req.headers.authorization || "";
+  const token = header.startsWith("Bearer ") ? header.slice(7).trim() : "";
+  if (!token) {
+    res.status(401).json({ success: false, message: "Please log in again before making game purchases." });
+    return null;
+  }
+  const { data, error } = await supabase.auth.getUser(token);
+  if (error || !data?.user?.id) {
+    res.status(401).json({ success: false, message: "Your game session has expired. Please log in again." });
+    return null;
+  }
+  return data.user;
+}
+
+app.post("/api/vehicles/buy", async (req, res) => {
+  try {
+    const user = await requirePlayer(req, res);
+    if (!user) return;
+    const requestedUserId = String(req.body?.userId || user.id);
+    if (requestedUserId !== user.id) return res.status(403).json({ success: false, message: "You can only purchase vehicles for your own character." });
+    const vehicleId = String(req.body?.vehicleId || "").trim();
+    if (!vehicleId || vehicleId.length > 100) return res.status(400).json({ success: false, message: "A valid vehicle is required." });
+    const { data, error } = await supabase.rpc("purchase_vehicle_secure", { p_user_id: user.id, p_vehicle_id: vehicleId });
+    if (error) {
+      console.error("Vehicle purchase failed:", error.message);
+      return res.status(503).json({ success: false, message: "Secure vehicle purchases are not configured yet. No money was deducted." });
+    }
+    if (!data?.success) return res.status(400).json(data || { success: false, message: "Purchase could not be completed." });
+    return res.json(data);
+  } catch (error) {
+    console.error("Vehicle purchase error:", error);
+    return res.status(500).json({ success: false, message: "Vehicle purchase failed. No success was recorded." });
+  }
+});
+
+app.post("/api/missions/complete", async (req, res) => {
+  try {
+    const user = await requirePlayer(req, res);
+    if (!user) return;
+    const requestedUserId = String(req.body?.userId || user.id);
+    if (requestedUserId !== user.id) return res.status(403).json({ success: false, message: "You can only claim rewards for your own character." });
+    const mission = String(req.body?.mission || "").trim();
+    if (mission !== "delivery_1") return res.status(400).json({ success: false, message: "Unknown mission." });
+    const { data, error } = await supabase.rpc("complete_delivery_mission_secure", { p_user_id: user.id, p_mission_code: mission });
+    if (error) {
+      console.error("Mission reward failed:", error.message);
+      return res.status(503).json({ success: false, message: "Secure mission rewards are not configured yet." });
+    }
+    if (!data?.success) return res.status(400).json(data || { success: false, message: "Mission reward could not be claimed." });
+    return res.json(data);
+  } catch (error) {
+    console.error("Mission completion error:", error);
+    return res.status(500).json({ success: false, message: "Mission completion failed." });
+  }
+});
+
+/* ==========================================
    404
 ========================================== */
 
